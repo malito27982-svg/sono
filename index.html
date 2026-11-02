@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>Sono</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sono">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#070b1d">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" sizes="180x180" href="icone-180.png">
+<link rel="icon" type="image/png" href="icone-180.png">
+<style>
+:root { --bg:#070b1d; --bg2:#0e1433; --ink:#eef1fb; --ink2:#a9b2d6; --ink3:#6d76a0; --ok:#5be3a8; --ruim:#ff7a8a; --bord:rgba(255,255,255,.10); }
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body { margin:0; height:100%; }
+body { background:radial-gradient(120% 70% at 50% -10%, #1d2563 0%, var(--bg2) 45%, var(--bg) 100%) fixed, var(--bg); color:var(--ink);
+  font-family:-apple-system,"SF Pro Rounded",system-ui,"Segoe UI",sans-serif; -webkit-user-select:none; user-select:none; overflow-x:hidden; }
+.ceu { position:fixed; inset:0; pointer-events:none; overflow:hidden; }
+.ceu i { position:absolute; width:2px; height:2px; border-radius:50%; background:#fff; animation:pisca 4s ease-in-out infinite; }
+@keyframes pisca { 50% { opacity:.12; } }
+main { position:relative; min-height:100%; max-width:520px; margin:0 auto; display:flex; flex-direction:column; gap:16px;
+  padding:calc(env(safe-area-inset-top) + 22px) 16px calc(env(safe-area-inset-bottom) + 22px); }
+header { display:flex; align-items:baseline; justify-content:space-between; }
+h1 { margin:0; font-size:28px; letter-spacing:-.02em; }
+.hora { font-variant-numeric:tabular-nums; color:var(--ink2); font-size:17px; }
+.status { color:var(--ink2); font-size:16px; min-height:22px; margin-top:-6px; }
+.status b { color:var(--ink); }
+.botoes { display:grid; gap:14px; }
+.bt { position:relative; border:0; border-radius:30px; width:100%; min-height:180px; padding:20px; font:inherit; color:#fff; cursor:pointer;
+  display:flex; align-items:center; gap:18px; text-align:left; box-shadow:0 18px 40px -18px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.25);
+  transition:transform .12s ease, opacity .2s ease; }
+.bt:active { transform:scale(.97); }
+.bt .ic { font-size:64px; line-height:1; filter:drop-shadow(0 6px 14px rgba(0,0,0,.35)); }
+.bt .tx { display:flex; flex-direction:column; gap:4px; }
+.bt .tx b { font-size:34px; letter-spacing:-.02em; }
+.bt .tx small { font-size:15px; opacity:.85; }
+.bt.dormir { background:linear-gradient(135deg,#5b4ce0 0%,#3a2fa8 55%,#22206b 100%); }
+.bt.acordei { background:linear-gradient(135deg,#ffb347 0%,#ff8a3d 55%,#e5603a 100%); color:#2a1300; }
+.bt[disabled] { opacity:.5; }
+.erro { color:var(--ruim); text-align:center; font-size:15px; min-height:20px; }
+footer { color:var(--ink3); font-size:12px; text-align:center; margin-top:auto; padding-top:6px; line-height:1.5; }
+.conf { position:fixed; inset:0; z-index:10; display:grid; place-items:center; padding:24px; background:rgba(5,8,22,.8);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); opacity:0; pointer-events:none; transition:opacity .25s ease; }
+.conf.on { opacity:1; pointer-events:auto; }
+.conf .box { text-align:center; max-width:380px; width:100%; }
+.conf .grande { font-size:92px; line-height:1; }
+.conf h2 { margin:14px 0 4px; font-size:32px; letter-spacing:-.02em; font-variant-numeric:tabular-nums; }
+.conf p { margin:0; color:var(--ink2); font-size:17px; }
+.conf .acoes { display:grid; gap:10px; margin-top:26px; }
+.conf button { border:0; border-radius:18px; padding:16px; font:inherit; font-size:18px; cursor:pointer; }
+.conf .fechar { background:#fff; color:#111; font-weight:700; }
+.conf .desf { background:rgba(255,255,255,.1); color:var(--ink); border:1px solid var(--bord); }
+.conf .barra { height:4px; border-radius:4px; background:rgba(255,255,255,.12); overflow:hidden; margin-top:8px; }
+.conf .barra i { display:block; height:100%; background:#b9a8ff; transform-origin:left; }
+.sem { display:none; text-align:center; color:var(--ink2); font-size:16px; margin-top:30px; }
+body.semlink .botoes, body.semlink .status { display:none; } body.semlink .sem { display:block; }
+</style>
+</head>
+<body>
+<div class="ceu" id="ceu"></div>
+<main>
+  <header><h1>Sono</h1><div class="hora" id="hora">--:--</div></header>
+  <div class="status" id="status">&nbsp;</div>
+  <div class="botoes">
+    <button class="bt dormir" id="bt-dormir"><span class="ic">😴</span><span class="tx"><b>dormi</b><small>toca quando deitar</small></span></button>
+    <button class="bt acordei" id="bt-acordei"><span class="ic">☀️</span><span class="tx"><b>acordei</b><small>toca quando levantar</small></span></button>
+  </div>
+  <div class="sem">🔒 link incompleto — abre pelo link completo que a Secretaria mandou.</div>
+  <div class="erro" id="erro"></div>
+  <footer>só manda "dormi/acordei + hora".<br>a Secretaria puxa em até 30 s.</footer>
+</main>
+<div class="conf" id="conf" role="dialog" aria-live="polite">
+  <div class="box">
+    <div class="grande" id="conf-ic">🌙</div>
+    <h2 id="conf-t">✓ anotado</h2>
+    <p id="conf-s"></p>
+    <div class="acoes">
+      <button class="fechar" id="conf-ok">ok</button>
+      <button class="desf" id="conf-desf">↩️ desfazer <span id="conf-seg">60</span>s</button>
+    </div>
+    <div class="barra"><i id="conf-barra"></i></div>
+  </div>
+</div>
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var fmtH = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+  var hh = function (ms) { return fmtH.format(new Date(ms)); };
+  var DESFAZ = 60000;
+  var ls = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+             set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+
+  // tópico + chave vêm SÓ do #fragmento (não vão pro servidor da página); guarda pro app da Tela de Início
+  var h = new URLSearchParams(location.hash.slice(1));
+  var T = h.get('t') || ls.get('sono_t'), K = h.get('k') || ls.get('sono_k');
+  if (h.get('t') && h.get('k')) { ls.set('sono_t', h.get('t')); ls.set('sono_k', h.get('k')); }
+  var valido = /^[A-Za-z0-9_-]{32,64}$/.test(T || '') && /^[A-Za-z0-9_-]{16,64}$/.test(K || '');
+  if (!valido) document.body.classList.add('semlink');
+
+  (function () { var c = $('ceu'), s = ''; for (var i = 0; i < 60; i++) s += '<i style="left:' + (Math.random() * 100).toFixed(1) + '%;top:' + (Math.random() * 70).toFixed(1) + '%;animation-delay:' + (Math.random() * 4).toFixed(1) + 's;opacity:' + (.2 + Math.random() * .6).toFixed(2) + '"></i>'; c.innerHTML = s; })();
+  function relogio() { $('hora').textContent = hh(Date.now()); }
+  setInterval(relogio, 15000); relogio();
+
+  function status() {
+    var u = ls.get('sono_ultimo'); if (!u) { $('status').innerHTML = '&nbsp;'; return; }
+    try { u = JSON.parse(u); } catch (e) { return; }
+    $('status').innerHTML = (u.a === 'dormir' ? '🌙 último toque: <b>dormi ' : '☀️ último toque: <b>acordei ') + hh(u.ts) + '</b>';
+  }
+  status();
+
+  var b64url = function (buf) { var s = '', b = new Uint8Array(buf); for (var i = 0; i < b.length; i++) s += String.fromCharCode(b[i]); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); };
+  var nonce = function () { var b = new Uint8Array(12); crypto.getRandomValues(b); return b64url(b); };
+  function assinar(m) {
+    var enc = new TextEncoder();
+    return crypto.subtle.importKey('raw', enc.encode(K), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
+      .then(function (key) { return crypto.subtle.sign('HMAC', key, enc.encode(m.a + '|' + m.ts + '|' + m.n + '|' + (m.r || ''))); })
+      .then(function (sig) { m.h = b64url(sig).slice(0, 22); return m; });
+  }
+  function enviar(m) {
+    return assinar(m).then(function (msg) {
+      return fetch('https://ntfy.sh/' + encodeURIComponent(T), { method: 'POST', body: JSON.stringify(msg), cache: 'no-store', referrerPolicy: 'no-referrer' });
+    }).then(function (r) { if (!r.ok) throw new Error(r.status === 429 ? 'muitos toques — espera um pouco' : 'o correio respondeu ' + r.status); return m; });
+  }
+
+  var ocupado = false, ult = null, tmr = null;
+  function abrir(m) {
+    $('conf-ic').textContent = m.a === 'dormir' ? '🌙' : '☀️';
+    $('conf-t').textContent = '✓ anotado ' + hh(m.ts);
+    $('conf-s').textContent = m.a === 'dormir' ? 'boa noite. amanhã é só tocar no ☀️ acordei.' : 'bom dia ☀️';
+    $('conf-desf').style.display = ''; $('conf').classList.add('on');
+    var barra = $('conf-barra');
+    clearInterval(tmr);
+    tmr = setInterval(function () {
+      var falta = ult ? ult.ts + DESFAZ - Date.now() : 0;
+      if (falta <= 0) { clearInterval(tmr); $('conf-desf').style.display = 'none'; barra.style.transform = 'scaleX(0)'; return; }
+      $('conf-seg').textContent = Math.ceil(falta / 1000);
+      barra.style.transform = 'scaleX(' + (falta / DESFAZ) + ')';
+    }, 250);
+  }
+  function fechar() { $('conf').classList.remove('on'); clearInterval(tmr); }
+
+  function tocar(a) {
+    if (ocupado || !valido) return;
+    ocupado = true; $('erro').textContent = '';
+    var m = { a: a, ts: Date.now(), n: nonce() };
+    enviar(m).then(function () {
+      ult = m; ls.set('sono_ultimo', JSON.stringify({ a: a, ts: m.ts })); status(); abrir(m);
+      if (navigator.vibrate) navigator.vibrate(30);
+    }).catch(function (e) { $('erro').textContent = '😕 não foi: ' + (e.message || 'sem internet') + ' — tenta de novo'; })
+      .then(function () { ocupado = false; });
+  }
+  $('bt-dormir').onclick = function () { tocar('dormir'); };
+  $('bt-acordei').onclick = function () { tocar('acordei'); };
+  $('conf-ok').onclick = fechar;
+  $('conf-desf').onclick = function () {
+    if (!ult || Date.now() - ult.ts > DESFAZ) return;
+    var orig = ult; ult = null; clearInterval(tmr);
+    enviar({ a: 'desfazer', ts: Date.now(), n: nonce(), r: orig.n }).then(function () {
+      ls.set('sono_ultimo', ''); status();
+      $('conf-ic').textContent = '↩️'; $('conf-t').textContent = 'desfeito'; $('conf-s').textContent = 'a Secretaria volta como estava.';
+      $('conf-desf').style.display = 'none'; setTimeout(fechar, 1600);
+    }).catch(function (e) { ult = orig; $('conf-s').textContent = '😕 não desfez: ' + (e.message || 'sem internet'); });
+  };
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) relogio(); });
+})();
+</script>
+</body>
+</html>
