@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>abrindo…</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<style>
+:root { --bg:#0b1020; --ink:#eef1fb; --ink2:#a9b2d6; }
+html,body { margin:0; height:100%; background:var(--bg); color:var(--ink); font-family:-apple-system,system-ui,"Segoe UI",sans-serif; }
+main { min-height:100%; display:grid; place-items:center; text-align:center; padding:24px; }
+.r { width:42px; height:42px; border-radius:50%; border:4px solid rgba(255,255,255,.15); border-top-color:#b9a8ff; margin:0 auto 18px; animation:g 1s linear infinite; }
+@keyframes g { to { transform:rotate(360deg); } }
+p { color:var(--ink2); font-size:17px; margin:0; } button { margin-top:18px; border:0; border-radius:14px; padding:14px 22px; font:inherit; font-size:17px; background:#5b4ce0; color:#fff; }
+</style>
+</head>
+<body>
+<main><div><div class="r" id="r"></div><p id="m">abrindo…</p><button id="b" hidden>tentar de novo</button></div></main>
+<script>
+// LINK FIXO (10/11/2026): o endereço do túnel muda quando o PC reinicia. O PC publica o endereço atual
+// num tópico do ntfy; esta página lê o último e redireciona. Link: ir.html#<tópico>[/caminho]
+(function () {
+  var h = location.hash.slice(1), i = h.indexOf('/');
+  var topico = i < 0 ? h : h.slice(0, i), caminho = i < 0 ? '/' : h.slice(i);
+  var m = document.getElementById('m'), b = document.getElementById('b'), r = document.getElementById('r');
+  function erro(t) { m.textContent = t; r.hidden = true; b.hidden = false; }
+  b.onclick = function () { location.reload(); };
+  if (!/^[A-Za-z0-9_-]{20,64}$/.test(topico)) return erro('link incompleto');
+  fetch('https://ntfy.sh/' + topico + '/json?poll=1&since=latest', { cache: 'no-store', referrerPolicy: 'no-referrer' })
+    .then(function (x) { if (!x.ok) throw 0; return x.text(); })
+    .then(function (t) {
+      var ev = t.split('\n').filter(Boolean).map(function (l) { try { return JSON.parse(l); } catch (e) { return null; } }).filter(function (e) { return e && e.event === 'message'; }).pop();
+      var u = ev && String(ev.message || '').trim();
+      if (!u || !/^https:\/\/[a-z0-9-]+\.trycloudflare\.com\/?$/.test(u)) return erro('o sistema está reiniciando — tenta de novo em 2 minutos');
+      location.replace(u.replace(/\/$/, '') + (/^\/[A-Za-z0-9_\-\/.?=&%]*$/.test(caminho) ? caminho : '/'));
+    })
+    .catch(function () { erro('sem internet — tenta de novo'); });
+})();
+</script>
+</body>
+</html>
