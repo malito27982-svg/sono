@@ -71,7 +71,8 @@ textarea::placeholder { color:var(--ink3); }
 .lista { display:flex; flex-direction:column; gap:8px; }
 .item { display:flex; align-items:center; gap:12px; background:var(--card); border:1px solid var(--bord); border-radius:18px; padding:14px; }
 .item .h { font-variant-numeric:tabular-nums; color:#b9a8ff; font-weight:700; font-size:15px; min-width:46px; }
-.item .t { flex:1; font-size:16px; line-height:1.3; }
+.item .t { flex:1; font-size:16px; line-height:1.3; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+.item .t.aberto { -webkit-line-clamp:unset; }
 .item .t small { display:block; color:var(--ink3); font-size:12px; margin-top:2px; }
 .item.atras .h { color:#ffb347; }
 .item .ck { flex:0 0 auto; width:34px; height:34px; border-radius:50%; border:2px solid rgba(255,255,255,.3); background:transparent; color:#fff; font-size:18px; padding:0; }
@@ -365,6 +366,7 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
     $('l-tarefas').innerHTML = ts.length ? ts.map(function (t) {
       return '<div class="item' + (t.dia ? ' atras' : '') + (t.feito ? ' feito' : '') + '"><div class="h">' + esc(t.dia || t.h) + '</div><div class="t">' + esc(t.t) + (t.dia ? '<small>atrasada</small>' : '') + '</div><button class="ck" data-id="' + t.id + '" data-f="' + (t.feito ? 1 : 0) + '">' + (t.feito ? '✓' : '') + '</button></div>';
     }).join('') : '<div class="vazio">nenhuma tarefa pra hoje 🎉</div>';
+    document.querySelectorAll('#l-tarefas .t, #l-agenda .t').forEach(function (x) { x.onclick = function () { x.classList.toggle('aberto'); }; });
     $('l-tarefas').querySelectorAll('.ck').forEach(function (b) { b.onclick = function () { marcar(+b.getAttribute('data-id'), b.getAttribute('data-f') !== '1'); }; });
     $('hoje-atual').textContent = dados.ger ? 'atualizado ' + hh(dados.ger) + (dados.sem_data ? ' · ' + dados.sem_data + ' tarefas sem data ficam na Secretaria' : '') : '';
   }
