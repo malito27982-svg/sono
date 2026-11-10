@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="icone-180.png">
 <link rel="icon" type="image/png" href="icone-180.png">
 <style>
-:root { --bg:#070b1d; --bg2:#0e1433; --ink:#eef1fb; --ink2:#a9b2d6; --ink3:#6d76a0; --ok:#5be3a8; --ruim:#ff7a8a; --bord:rgba(255,255,255,.10); }
+:root { --bg:#070b1d; --bg2:#0e1433; --ink:#eef1fb; --ink2:#a9b2d6; --ink3:#6d76a0; --ok:#5be3a8; --ruim:#ff7a8a; --bord:rgba(255,255,255,.10); --card:rgba(255,255,255,.06); }
 * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 html, body { margin:0; height:100%; }
 body { background:radial-gradient(120% 70% at 50% -10%, #1d2563 0%, var(--bg2) 45%, var(--bg) 100%) fixed, var(--bg); color:var(--ink);
@@ -24,7 +24,9 @@ body { background:radial-gradient(120% 70% at 50% -10%, #1d2563 0%, var(--bg2) 4
 .ceu i { position:absolute; width:2px; height:2px; border-radius:50%; background:#fff; animation:pisca 4s ease-in-out infinite; }
 @keyframes pisca { 50% { opacity:.12; } }
 main { position:relative; min-height:100%; max-width:520px; margin:0 auto; display:flex; flex-direction:column; gap:16px;
-  padding:calc(env(safe-area-inset-top) + 22px) 16px calc(env(safe-area-inset-bottom) + 22px); }
+  padding:calc(env(safe-area-inset-top) + 22px) 16px calc(env(safe-area-inset-bottom) + 96px); }
+.aba { display:none; flex-direction:column; gap:16px; flex:1; }
+.aba.on { display:flex; }
 header { display:flex; align-items:baseline; justify-content:space-between; }
 h1 { margin:0; font-size:28px; letter-spacing:-.02em; }
 .hora { font-variant-numeric:tabular-nums; color:var(--ink2); font-size:17px; }
@@ -43,7 +45,53 @@ h1 { margin:0; font-size:28px; letter-spacing:-.02em; }
 .bt.acordei { background:linear-gradient(135deg,#ffb347 0%,#ff8a3d 55%,#e5603a 100%); color:#2a1300; }
 .bt[disabled] { opacity:.5; }
 .erro { color:var(--ruim); text-align:center; font-size:15px; min-height:20px; }
-footer { color:var(--ink3); font-size:12px; text-align:center; margin-top:auto; padding-top:6px; line-height:1.5; }
+.rodape { color:var(--ink3); font-size:12px; text-align:center; margin-top:auto; padding-top:6px; line-height:1.5; }
+
+/* 📝 notas */
+textarea { width:100%; min-height:42vh; resize:none; border:1px solid var(--bord); border-radius:22px; background:var(--card); color:var(--ink);
+  font:inherit; font-size:18px; line-height:1.45; padding:16px; outline:none; -webkit-user-select:text; user-select:text; }
+textarea:focus { border-color:rgba(185,168,255,.55); }
+textarea::placeholder { color:var(--ink3); }
+.fotos { display:flex; gap:10px; overflow-x:auto; padding-bottom:2px; }
+.fotos:empty { display:none; }
+.fotos .f { position:relative; flex:0 0 auto; width:84px; height:84px; border-radius:16px; background-size:cover; background-position:center; border:1px solid var(--bord); }
+.fotos .f button { position:absolute; top:-6px; right:-6px; width:26px; height:26px; border-radius:50%; border:0; background:#ff5a6e; color:#fff; font-size:15px; line-height:26px; padding:0; }
+.linha { display:grid; grid-template-columns:auto 1fr; gap:10px; }
+.bfoto, .benviar { border:0; border-radius:20px; font:inherit; font-size:18px; padding:18px; cursor:pointer; }
+.bfoto { background:var(--card); color:var(--ink); border:1px solid var(--bord); }
+.benviar { background:linear-gradient(135deg,#7b6cff,#5b4ce0); color:#fff; font-weight:700; box-shadow:0 14px 30px -14px rgba(91,76,224,.9); }
+.benviar:active, .bfoto:active { transform:scale(.97); }
+.benviar[disabled] { opacity:.55; }
+.prog { font-size:14px; color:var(--ink2); text-align:center; min-height:18px; }
+.hist { display:flex; flex-direction:column; gap:6px; }
+.hist div { font-size:13px; color:var(--ink3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+/* ✅ hoje */
+.sec { font-size:13px; color:var(--ink3); text-transform:uppercase; letter-spacing:.08em; margin:4px 2px -6px; }
+.lista { display:flex; flex-direction:column; gap:8px; }
+.item { display:flex; align-items:center; gap:12px; background:var(--card); border:1px solid var(--bord); border-radius:18px; padding:14px; }
+.item .h { font-variant-numeric:tabular-nums; color:#b9a8ff; font-weight:700; font-size:15px; min-width:46px; }
+.item .t { flex:1; font-size:16px; line-height:1.3; }
+.item .t small { display:block; color:var(--ink3); font-size:12px; margin-top:2px; }
+.item.atras .h { color:#ffb347; }
+.item .ck { flex:0 0 auto; width:34px; height:34px; border-radius:50%; border:2px solid rgba(255,255,255,.3); background:transparent; color:#fff; font-size:18px; padding:0; }
+.item.feito { opacity:.45; } .item.feito .t { text-decoration:line-through; }
+.item.feito .ck { background:var(--ok); border-color:var(--ok); color:#06301f; }
+.vazio { color:var(--ink3); font-size:15px; text-align:center; padding:10px; }
+.nova { display:grid; grid-template-columns:1fr auto; gap:8px; }
+.nova input { min-width:0; border:1px solid var(--bord); border-radius:16px; background:var(--card); color:var(--ink); font:inherit; font-size:16px; padding:14px; outline:none; -webkit-user-select:text; user-select:text; }
+.nova button { border:0; border-radius:16px; background:#5b4ce0; color:#fff; font:inherit; font-size:22px; padding:0 18px; }
+.atual { font-size:12px; color:var(--ink3); text-align:center; }
+
+/* barra de abas */
+nav { position:fixed; left:0; right:0; bottom:0; z-index:5; display:flex; justify-content:center; padding:8px 16px calc(env(safe-area-inset-bottom) + 8px);
+  background:rgba(7,11,29,.82); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border-top:1px solid var(--bord); }
+nav .in { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; width:100%; max-width:520px; }
+nav button { border:0; background:transparent; color:var(--ink3); font:inherit; font-size:12px; padding:6px 0; border-radius:14px; display:flex; flex-direction:column; align-items:center; gap:2px; }
+nav button span { font-size:24px; line-height:1.1; filter:grayscale(.7); }
+nav button.on { color:var(--ink); background:rgba(255,255,255,.07); }
+nav button.on span { filter:none; }
+
 .conf { position:fixed; inset:0; z-index:10; display:grid; place-items:center; padding:24px; background:rgba(5,8,22,.8);
   backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); opacity:0; pointer-events:none; transition:opacity .25s ease; }
 .conf.on { opacity:1; pointer-events:auto; }
@@ -58,22 +106,58 @@ footer { color:var(--ink3); font-size:12px; text-align:center; margin-top:auto; 
 .conf .barra { height:4px; border-radius:4px; background:rgba(255,255,255,.12); overflow:hidden; margin-top:8px; }
 .conf .barra i { display:block; height:100%; background:#b9a8ff; transform-origin:left; }
 .sem { display:none; text-align:center; color:var(--ink2); font-size:16px; margin-top:30px; }
-body.semlink .botoes, body.semlink .status { display:none; } body.semlink .sem { display:block; }
+body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .sem { display:block; }
 </style>
 </head>
 <body>
 <div class="ceu" id="ceu"></div>
 <main>
-  <header><h1>Sono</h1><div class="hora" id="hora">--:--</div></header>
-  <div class="status" id="status">&nbsp;</div>
-  <div class="botoes">
-    <button class="bt dormir" id="bt-dormir"><span class="ic">😴</span><span class="tx"><b>dormi</b><small>toca quando deitar</small></span></button>
-    <button class="bt acordei" id="bt-acordei"><span class="ic">☀️</span><span class="tx"><b>acordei</b><small>toca quando levantar</small></span></button>
-  </div>
   <div class="sem">🔒 link incompleto — abre pelo link completo que a Secretaria mandou.</div>
-  <div class="erro" id="erro"></div>
-  <footer>só manda "dormi/acordei + hora".<br>a Secretaria puxa em até 30 s.</footer>
+
+  <!-- 😴 SONO -->
+  <section class="aba" id="aba-sono">
+    <header><h1>Sono</h1><div class="hora" id="hora">--:--</div></header>
+    <div class="status" id="status">&nbsp;</div>
+    <div class="botoes">
+      <button class="bt dormir" id="bt-dormir"><span class="ic">😴</span><span class="tx"><b>dormi</b><small>toca quando deitar</small></span></button>
+      <button class="bt acordei" id="bt-acordei"><span class="ic">☀️</span><span class="tx"><b>acordei</b><small>toca quando levantar</small></span></button>
+    </div>
+    <div class="erro" id="erro"></div>
+    <div class="rodape">só manda "dormi/acordei + hora".<br>a Secretaria puxa em até 30 s.</div>
+  </section>
+
+  <!-- 📝 NOTAS -->
+  <section class="aba" id="aba-notas">
+    <header><h1>Notas</h1><div class="hora" id="nota-salvo"></div></header>
+    <textarea id="nota" placeholder="escreve aqui o que vier na cabeça…&#10;a Secretaria organiza depois"></textarea>
+    <div class="fotos" id="fotos"></div>
+    <input type="file" id="arq" accept="image/*" multiple hidden>
+    <div class="linha">
+      <button class="bfoto" id="b-foto">📷 foto</button>
+      <button class="benviar" id="b-enviar">📤 mandar pra Secretaria</button>
+    </div>
+    <div class="prog" id="nota-prog"></div>
+    <div class="hist" id="nota-hist"></div>
+  </section>
+
+  <!-- ✅ HOJE -->
+  <section class="aba" id="aba-hoje">
+    <header><h1>Hoje</h1><div class="hora" id="hoje-data"></div></header>
+    <div class="sec">📅 agenda</div>
+    <div class="lista" id="l-agenda"></div>
+    <div class="sec">✅ tarefas</div>
+    <div class="lista" id="l-tarefas"></div>
+    <div class="nova"><input id="nova-t" placeholder="+ tarefa pra hoje" enterkeyhint="send" maxlength="300"><button id="nova-b">＋</button></div>
+    <div class="atual" id="hoje-atual"></div>
+  </section>
 </main>
+
+<nav><div class="in">
+  <button data-aba="sono"><span>😴</span>sono</button>
+  <button data-aba="notas"><span>📝</span>notas</button>
+  <button data-aba="hoje"><span>✅</span>hoje</button>
+</div></nav>
+
 <div class="conf" id="conf" role="dialog" aria-live="polite">
   <div class="box">
     <div class="grande" id="conf-ic">🌙</div>
@@ -92,6 +176,7 @@ body.semlink .botoes, body.semlink .status { display:none; } body.semlink .sem {
   var $ = function (id) { return document.getElementById(id); };
   var fmtH = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
   var hh = function (ms) { return fmtH.format(new Date(ms)); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
   var DESFAZ = 60000;
   var ls = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
              set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
@@ -100,8 +185,18 @@ body.semlink .botoes, body.semlink .status { display:none; } body.semlink .sem {
   var h = new URLSearchParams(location.hash.slice(1));
   var T = h.get('t') || ls.get('sono_t'), K = h.get('k') || ls.get('sono_k');
   if (h.get('t') && h.get('k')) { ls.set('sono_t', h.get('t')); ls.set('sono_k', h.get('k')); }
-  var valido = /^[A-Za-z0-9_-]{32,64}$/.test(T || '') && /^[A-Za-z0-9_-]{16,64}$/.test(K || '');
+  var valido = /^[A-Za-z0-9_-]{32,62}$/.test(T || '') && /^[A-Za-z0-9_-]{16,64}$/.test(K || '');
   if (!valido) document.body.classList.add('semlink');
+
+  // ---------- abas ----------
+  var abaIni = h.get('aba') || ls.get('app_aba') || 'sono';
+  function irAba(a) {
+    ['sono', 'notas', 'hoje'].forEach(function (x) { $('aba-' + x).classList.toggle('on', x === a); });
+    document.querySelectorAll('nav button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-aba') === a); });
+    ls.set('app_aba', a);
+    if (a === 'hoje') carregarHoje();
+  }
+  document.querySelectorAll('nav button').forEach(function (b) { b.onclick = function () { irAba(b.getAttribute('data-aba')); }; });
 
   (function () { var c = $('ceu'), s = ''; for (var i = 0; i < 60; i++) s += '<i style="left:' + (Math.random() * 100).toFixed(1) + '%;top:' + (Math.random() * 70).toFixed(1) + '%;animation-delay:' + (Math.random() * 4).toFixed(1) + 's;opacity:' + (.2 + Math.random() * .6).toFixed(2) + '"></i>'; c.innerHTML = s; })();
   function relogio() { $('hora').textContent = hh(Date.now()); }
@@ -116,8 +211,10 @@ body.semlink .botoes, body.semlink .status { display:none; } body.semlink .sem {
 
   var b64url = function (buf) { var s = '', b = new Uint8Array(buf); for (var i = 0; i < b.length; i++) s += String.fromCharCode(b[i]); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); };
   var nonce = function () { var b = new Uint8Array(12); crypto.getRandomValues(b); return b64url(b); };
+  var enc = new TextEncoder();
+
+  // ======================= 😴 SONO (igual antes) =======================
   function assinar(m) {
-    var enc = new TextEncoder();
     return crypto.subtle.importKey('raw', enc.encode(K), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
       .then(function (key) { return crypto.subtle.sign('HMAC', key, enc.encode(m.a + '|' + m.ts + '|' + m.n + '|' + (m.r || ''))); })
       .then(function (sig) { m.h = b64url(sig).slice(0, 22); return m; });
@@ -127,7 +224,6 @@ body.semlink .botoes, body.semlink .status { display:none; } body.semlink .sem {
       return fetch('https://ntfy.sh/' + encodeURIComponent(T), { method: 'POST', body: JSON.stringify(msg), cache: 'no-store', referrerPolicy: 'no-referrer' });
     }).then(function (r) { if (!r.ok) throw new Error(r.status === 429 ? 'muitos toques — espera um pouco' : 'o correio respondeu ' + r.status); return m; });
   }
-
   var ocupado = false, ult = null, tmr = null;
   function abrir(m) {
     $('conf-ic').textContent = m.a === 'dormir' ? '🌙' : '☀️';
@@ -143,8 +239,7 @@ body.semlink .botoes, body.semlink .status { display:none; } body.semlink .sem {
       barra.style.transform = 'scaleX(' + (falta / DESFAZ) + ')';
     }, 250);
   }
-  function fechar() { $('conf').classList.remove('on'); clearInterval(tmr); }
-
+  function fecharConf() { $('conf').classList.remove('on'); clearInterval(tmr); }
   function tocar(a) {
     if (ocupado || !valido) return;
     ocupado = true; $('erro').textContent = '';
@@ -157,17 +252,173 @@ body.semlink .botoes, body.semlink .status { display:none; } body.semlink .sem {
   }
   $('bt-dormir').onclick = function () { tocar('dormir'); };
   $('bt-acordei').onclick = function () { tocar('acordei'); };
-  $('conf-ok').onclick = fechar;
+  $('conf-ok').onclick = fecharConf;
   $('conf-desf').onclick = function () {
     if (!ult || Date.now() - ult.ts > DESFAZ) return;
     var orig = ult; ult = null; clearInterval(tmr);
     enviar({ a: 'desfazer', ts: Date.now(), n: nonce(), r: orig.n }).then(function () {
       ls.set('sono_ultimo', ''); status();
       $('conf-ic').textContent = '↩️'; $('conf-t').textContent = 'desfeito'; $('conf-s').textContent = 'a Secretaria volta como estava.';
-      $('conf-desf').style.display = 'none'; setTimeout(fechar, 1600);
+      $('conf-desf').style.display = 'none'; setTimeout(fecharConf, 1600);
     }).catch(function (e) { ult = orig; $('conf-s').textContent = '😕 não desfez: ' + (e.message || 'sem internet'); });
   };
-  document.addEventListener('visibilitychange', function () { if (!document.hidden) relogio(); });
+
+  // ======================= cofre (AES-GCM) das abas novas =======================
+  // chave = SHA-256("<uso>|" + K). Tudo que sai do celular vai cifrado; a foto do dia chega cifrada.
+  var chaves = {};
+  function chave(uso) {
+    if (!chaves[uso]) chaves[uso] = crypto.subtle.digest('SHA-256', enc.encode(uso + '|' + K))
+      .then(function (d) { return crypto.subtle.importKey('raw', d, 'AES-GCM', false, ['encrypt', 'decrypt']); });
+    return chaves[uso];
+  }
+  // manda 1 pedaço cifrado como anexo no tópico de entrada (<T>n); meta vai aberta no "message"
+  function mandarPedaco(meta, bytes) {
+    var iv = crypto.getRandomValues(new Uint8Array(12));
+    meta.iv = b64url(iv);
+    var aad = enc.encode(meta.a + '|' + meta.ts + '|' + meta.n + '|' + (meta.g || '') + '|' + (meta.i == null ? '' : meta.i));
+    return chave('cel').then(function (k) { return crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv, additionalData: aad }, k, bytes); })
+      .then(function (c) {
+        return fetch('https://ntfy.sh/' + encodeURIComponent(T + 'n') + '?filename=p.bin&message=' + encodeURIComponent(JSON.stringify(meta)),
+          { method: 'PUT', body: new Uint8Array(c), cache: 'no-store', referrerPolicy: 'no-referrer' });
+      }).then(function (r) { if (!r.ok) throw new Error(r.status === 429 ? 'muitos envios — espera 1 min' : (r.status === 413 ? 'foto grande demais' : 'o correio respondeu ' + r.status)); });
+  }
+
+  // ======================= 📝 NOTAS =======================
+  var fotos = []; // {blob, url}
+  $('nota').value = ls.get('nota_rasc') || '';
+  var tSalva = null;
+  $('nota').addEventListener('input', function () {
+    clearTimeout(tSalva); tSalva = setTimeout(function () { ls.set('nota_rasc', $('nota').value); $('nota-salvo').textContent = 'salvo ✓'; }, 400);
+  });
+  function desenharFotos() {
+    $('fotos').innerHTML = fotos.map(function (f, i) { return '<div class="f" style="background-image:url(' + f.url + ')"><button data-i="' + i + '">×</button></div>'; }).join('');
+    $('fotos').querySelectorAll('button').forEach(function (b) { b.onclick = function () { var i = +b.getAttribute('data-i'); URL.revokeObjectURL(fotos[i].url); fotos.splice(i, 1); desenharFotos(); }; });
+  }
+  // diminui a foto (máx 1600 px, JPEG) — chega rápido e cabe no correio
+  function encolher(file) {
+    return new Promise(function (ok, erro) {
+      var img = new Image(), u = URL.createObjectURL(file);
+      img.onload = function () {
+        var M = 1600, w = img.naturalWidth, h2 = img.naturalHeight, s = Math.min(1, M / Math.max(w, h2));
+        var c = document.createElement('canvas'); c.width = Math.round(w * s); c.height = Math.round(h2 * s);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(u);
+        c.toBlob(function (b) { b ? ok(b) : erro(new Error('não li a foto')); }, 'image/jpeg', 0.82);
+      };
+      img.onerror = function () { URL.revokeObjectURL(u); erro(new Error('não li a foto')); };
+      img.src = u;
+    });
+  }
+  $('b-foto').onclick = function () { $('arq').click(); };
+  $('arq').onchange = function () {
+    var fs = Array.prototype.slice.call($('arq').files || []).slice(0, 10 - fotos.length);
+    $('arq').value = '';
+    $('nota-prog').textContent = fs.length ? 'preparando foto…' : '';
+    fs.reduce(function (p, f) { return p.then(function () { return encolher(f).then(function (b) { fotos.push({ blob: b, url: URL.createObjectURL(b) }); desenharFotos(); }); }); }, Promise.resolve())
+      .then(function () { $('nota-prog').textContent = ''; }).catch(function (e) { $('nota-prog').textContent = '😕 ' + e.message; });
+  };
+  function hist() {
+    var l = []; try { l = JSON.parse(ls.get('nota_hist') || '[]'); } catch (e) {}
+    $('nota-hist').innerHTML = l.slice(0, 5).map(function (x) { return '<div>✓ ' + esc(new Date(x.ts).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })) + ' ' + hh(x.ts) + ' · ' + (x.f ? '📷' + x.f + ' · ' : '') + esc(x.t) + '</div>'; }).join('');
+    return l;
+  }
+  hist();
+  var mandando = false;
+  $('b-enviar').onclick = function () {
+    var texto = $('nota').value.trim();
+    if (mandando || !valido || (!texto && !fotos.length)) return;
+    mandando = true; $('b-enviar').disabled = true;
+    var g = nonce(), ts = Date.now(), lista = fotos.slice();
+    var passo = Promise.resolve();
+    lista.forEach(function (f, i) {
+      passo = passo.then(function () {
+        $('nota-prog').textContent = 'mandando foto ' + (i + 1) + ' de ' + lista.length + '…';
+        return f.blob.arrayBuffer().then(function (b) { return mandarPedaco({ a: 'nota-img', ts: Date.now(), n: nonce(), g: g, i: i }, b); });
+      });
+    });
+    passo.then(function () {
+      $('nota-prog').textContent = 'mandando texto…';
+      return mandarPedaco({ a: 'nota', ts: Date.now(), n: nonce(), g: g, imgs: lista.length }, enc.encode(JSON.stringify({ texto: texto })));
+    }).then(function () {
+      var l = hist(); l.unshift({ ts: ts, t: (texto || '(só foto)').slice(0, 60), f: lista.length }); ls.set('nota_hist', JSON.stringify(l.slice(0, 20))); hist();
+      $('nota').value = ''; ls.set('nota_rasc', ''); $('nota-salvo').textContent = '';
+      fotos.forEach(function (f) { URL.revokeObjectURL(f.url); }); fotos = []; desenharFotos();
+      $('nota-prog').textContent = '✓ foi pra Secretaria — ela organiza';
+      if (navigator.vibrate) navigator.vibrate(30);
+      setTimeout(function () { $('nota-prog').textContent = ''; }, 4000);
+    }).catch(function (e) { $('nota-prog').textContent = '😕 não foi: ' + (e.message || 'sem internet') + ' — a nota continua aqui, tenta de novo'; })
+      .then(function () { mandando = false; $('b-enviar').disabled = false; });
+  };
+
+  // ======================= ✅ HOJE =======================
+  var dados = null;
+  try { dados = JSON.parse(ls.get('hoje_cache') || 'null'); } catch (e) {}
+  var pendFeito = {}; try { pendFeito = JSON.parse(ls.get('hoje_pend') || '{}'); } catch (e) {}
+  function desenharHoje() {
+    var hojeStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date());
+    $('hoje-data').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' });
+    if (!dados) { $('l-agenda').innerHTML = '<div class="vazio">carregando…</div>'; $('l-tarefas').innerHTML = ''; return; }
+    var velho = dados.data !== hojeStr;
+    $('l-agenda').innerHTML = velho ? '<div class="vazio">esperando a agenda de hoje…</div>' : (dados.agenda.length ? dados.agenda.map(function (e) {
+      return '<div class="item' + (e.feito ? ' feito' : '') + '"><div class="h">' + esc(e.h || 'dia') + '</div><div class="t">' + esc(e.t) + (e.local || e.fim ? '<small>' + esc([e.fim ? 'até ' + e.fim : '', e.local || ''].filter(Boolean).join(' · ')) + '</small>' : '') + '</div></div>';
+    }).join('') : '<div class="vazio">nada na agenda hoje</div>');
+    var ts = dados.tarefas.map(function (t) { var p = pendFeito[t.id]; return p == null ? t : Object.assign({}, t, { feito: p }); });
+    $('l-tarefas').innerHTML = ts.length ? ts.map(function (t) {
+      return '<div class="item' + (t.dia ? ' atras' : '') + (t.feito ? ' feito' : '') + '"><div class="h">' + esc(t.dia || t.h) + '</div><div class="t">' + esc(t.t) + (t.dia ? '<small>atrasada</small>' : '') + '</div><button class="ck" data-id="' + t.id + '" data-f="' + (t.feito ? 1 : 0) + '">' + (t.feito ? '✓' : '') + '</button></div>';
+    }).join('') : '<div class="vazio">nenhuma tarefa pra hoje 🎉</div>';
+    $('l-tarefas').querySelectorAll('.ck').forEach(function (b) { b.onclick = function () { marcar(+b.getAttribute('data-id'), b.getAttribute('data-f') !== '1'); }; });
+    $('hoje-atual').textContent = dados.ger ? 'atualizado ' + hh(dados.ger) + (dados.sem_data ? ' · ' + dados.sem_data + ' tarefas sem data ficam na Secretaria' : '') : '';
+  }
+  function marcar(id, feito) {
+    pendFeito[id] = feito; ls.set('hoje_pend', JSON.stringify(pendFeito)); desenharHoje();
+    if (navigator.vibrate) navigator.vibrate(20);
+    mandarPedaco({ a: 'feito', ts: Date.now(), n: nonce() }, enc.encode(JSON.stringify({ id: id, desfaz: !feito })))
+      .catch(function (e) { delete pendFeito[id]; ls.set('hoje_pend', JSON.stringify(pendFeito)); desenharHoje(); $('hoje-atual').textContent = '😕 não foi: ' + (e.message || 'sem internet'); });
+  }
+  function novaTarefa() {
+    var t = $('nova-t').value.trim(); if (!t || !valido) return;
+    $('nova-b').disabled = true;
+    mandarPedaco({ a: 'tarefa', ts: Date.now(), n: nonce() }, enc.encode(JSON.stringify({ texto: t })))
+      .then(function () { $('nova-t').value = ''; $('hoje-atual').textContent = '✓ mandei — aparece aqui em até 1 min'; setTimeout(carregarHoje, 45000); })
+      .catch(function (e) { $('hoje-atual').textContent = '😕 não foi: ' + (e.message || 'sem internet'); })
+      .then(function () { $('nova-b').disabled = false; });
+  }
+  $('nova-b').onclick = novaTarefa;
+  $('nova-t').addEventListener('keydown', function (e) { if (e.key === 'Enter') novaTarefa(); });
+
+  var carregando = false;
+  function carregarHoje() {
+    desenharHoje();
+    if (carregando || !valido) return;
+    carregando = true;
+    fetch('https://ntfy.sh/' + encodeURIComponent(T + 'h') + '/json?poll=1&since=latest', { cache: 'no-store', referrerPolicy: 'no-referrer' })
+      .then(function (r) { if (!r.ok) throw new Error('correio ' + r.status); return r.text(); })
+      .then(function (txt) {
+        var ev = txt.split('\n').filter(Boolean).map(function (l) { try { return JSON.parse(l); } catch (e) { return null; } })
+          .filter(function (e) { return e && e.event === 'message' && e.attachment && e.attachment.url; }).pop();
+        if (!ev) throw new Error('a Secretaria ainda não mandou');
+        return fetch(ev.attachment.url, { cache: 'no-store', referrerPolicy: 'no-referrer' }).then(function (r) { if (!r.ok) throw new Error('anexo ' + r.status); return r.arrayBuffer(); });
+      })
+      .then(function (buf) {
+        var b = new Uint8Array(buf);
+        return chave('hoje').then(function (k) { return crypto.subtle.decrypt({ name: 'AES-GCM', iv: b.slice(0, 12) }, k, b.slice(12)); });
+      })
+      .then(function (claro) {
+        var d = JSON.parse(new TextDecoder().decode(claro));
+        if (!dados || !dados.ger || d.ger >= dados.ger) {
+          // o que eu marquei e a Secretaria já confirmou sai da lista de pendentes
+          (d.tarefas || []).forEach(function (t) { if (pendFeito[t.id] === t.feito) delete pendFeito[t.id]; });
+          ls.set('hoje_pend', JSON.stringify(pendFeito));
+          dados = d; ls.set('hoje_cache', JSON.stringify(d));
+        }
+        desenharHoje();
+      })
+      .catch(function (e) { desenharHoje(); $('hoje-atual').textContent = (dados ? 'atualizado ' + hh(dados.ger) + ' · ' : '') + '😕 ' + (e.message || 'sem internet'); })
+      .then(function () { carregando = false; });
+  }
+  setInterval(function () { if (!document.hidden && $('aba-hoje').classList.contains('on')) carregarHoje(); }, 60000);
+
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) { relogio(); if ($('aba-hoje').classList.contains('on')) carregarHoje(); } });
+  irAba(['sono', 'notas', 'hoje'].indexOf(abaIni) >= 0 ? abaIni : 'sono');
 })();
 </script>
 </body>
