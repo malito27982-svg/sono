@@ -56,6 +56,7 @@ textarea::placeholder { color:var(--ink3); }
 .fotos:empty { display:none; }
 .fotos .f { position:relative; flex:0 0 auto; width:84px; height:84px; border-radius:16px; background-size:cover; background-position:center; border:1px solid var(--bord); }
 .fotos .f button { position:absolute; top:-6px; right:-6px; width:26px; height:26px; border-radius:50%; border:0; background:#ff5a6e; color:#fff; font-size:15px; line-height:26px; padding:0; }
+.campo { border:1px solid var(--bord); border-radius:16px; background:var(--card); color:var(--ink); font:inherit; font-size:17px; padding:16px; outline:none; -webkit-user-select:text; user-select:text; }
 .linha { display:grid; grid-template-columns:auto 1fr; gap:10px; }
 .bfoto, .benviar { border:0; border-radius:20px; font:inherit; font-size:18px; padding:18px; cursor:pointer; }
 .bfoto { background:var(--card); color:var(--ink); border:1px solid var(--bord); }
@@ -141,6 +142,18 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
     <div class="hist" id="nota-hist"></div>
   </section>
 
+  <!-- 🔑 SENHAS: manda 1 login pro cofre da Secretaria (cifrado). Nada fica salvo no celular. -->
+  <section class="aba" id="aba-senhas">
+    <header><h1>Senhas</h1><div class="hora">vai pro cofre</div></header>
+    <input id="s-site" class="campo" placeholder="site — ex.: tenda" autocomplete="off" autocapitalize="none" maxlength="80">
+    <input id="s-login" class="campo" placeholder="login / e-mail / cpf" autocomplete="off" autocapitalize="none" maxlength="160">
+    <input id="s-senha" class="campo" type="password" placeholder="senha" autocomplete="new-password" maxlength="300">
+    <button class="benviar" id="s-enviar">🔑 guardar no cofre</button>
+    <div class="prog" id="s-prog"></div>
+    <div class="hist" id="s-hist"></div>
+    <div class="rodape">vai criptografado. o cofre da Secretaria guarda quando você destrancar.<br>o celular não guarda a senha.</div>
+  </section>
+
   <!-- ✅ HOJE -->
   <section class="aba" id="aba-hoje">
     <header><h1>Hoje</h1><div class="hora" id="hoje-data"></div></header>
@@ -157,6 +170,7 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
   <button data-aba="sono"><span>😴</span>sono</button>
   <button data-aba="notas"><span>📝</span>notas</button>
   <button data-aba="hoje"><span>✅</span>hoje</button>
+  <button data-aba="senhas"><span>🔑</span>senhas</button>
 </div></nav>
 
 <div class="conf" id="conf" role="dialog" aria-live="polite">
@@ -192,7 +206,7 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
   // ---------- abas ----------
   var abaIni = h.get('aba') || ls.get('app_aba') || 'sono';
   function irAba(a) {
-    ['sono', 'notas', 'hoje'].forEach(function (x) { $('aba-' + x).classList.toggle('on', x === a); });
+    ['sono', 'notas', 'hoje', 'senhas'].forEach(function (x) { $('aba-' + x).classList.toggle('on', x === a); });
     document.querySelectorAll('nav button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-aba') === a); });
     ls.set('app_aba', a);
     if (a === 'hoje') carregarHoje();
@@ -283,6 +297,31 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
           { method: 'PUT', body: new Uint8Array(c), cache: 'no-store', referrerPolicy: 'no-referrer' });
       }).then(function (r) { if (!r.ok) throw new Error(r.status === 429 ? 'muitos envios — espera 1 min' : (r.status === 413 ? 'foto grande demais' : 'o correio respondeu ' + r.status)); });
   }
+
+  // ======================= 🔑 SENHAS =======================
+  // 10/11: escreve o site + login + senha 1 vez → vai cifrado (chave do app) pra caixa de entrada do cofre da Secretaria.
+  // O celular NÃO guarda a senha (nem rascunho): só lembra o NOME do site que mandou.
+  function histS() {
+    var l = []; try { l = JSON.parse(ls.get('senha_hist') || '[]'); } catch (e) {}
+    $('s-hist').innerHTML = l.slice(0, 8).map(function (x) { return '<div>✓ ' + esc(new Date(x.ts).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })) + ' ' + hh(x.ts) + ' · ' + esc(x.s) + '</div>'; }).join('');
+    return l;
+  }
+  histS();
+  var mandandoS = false;
+  $('s-enviar').onclick = function () {
+    var site = $('s-site').value.trim(), login = $('s-login').value.trim(), senha = $('s-senha').value;
+    if (mandandoS || !valido) return;
+    if (!site || !senha) { $('s-prog').textContent = 'preenche o site e a senha'; return; }
+    mandandoS = true; $('s-enviar').disabled = true; $('s-prog').textContent = 'mandando…';
+    mandarPedaco({ a: 'senha', ts: Date.now(), n: nonce() }, enc.encode(JSON.stringify({ servico: site, usuario: login, senha: senha })))
+      .then(function () {
+        $('s-senha').value = ''; $('s-login').value = ''; $('s-site').value = '';
+        var l = histS(); l.unshift({ ts: Date.now(), s: site.slice(0, 40) }); ls.set('senha_hist', JSON.stringify(l.slice(0, 20))); histS();
+        $('s-prog').textContent = '✓ mandei o login do ' + site + ' pro cofre';
+      })
+      .catch(function (e) { $('s-prog').textContent = '😕 ' + e.message; })
+      .then(function () { mandandoS = false; $('s-enviar').disabled = false; });
+  };
 
   // ======================= 📝 NOTAS =======================
   var fotos = []; // {blob, url}
@@ -420,7 +459,7 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
   setInterval(function () { if (!document.hidden && $('aba-hoje').classList.contains('on')) carregarHoje(); }, 60000);
 
   document.addEventListener('visibilitychange', function () { if (!document.hidden) { relogio(); if ($('aba-hoje').classList.contains('on')) carregarHoje(); } });
-  irAba(['sono', 'notas', 'hoje'].indexOf(abaIni) >= 0 ? abaIni : 'sono');
+  irAba(['sono', 'notas', 'hoje', 'senhas'].indexOf(abaIni) >= 0 ? abaIni : 'sono');
 })();
 </script>
 </body>
