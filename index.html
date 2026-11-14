@@ -170,7 +170,7 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
   <button data-aba="sono"><span>😴</span>sono</button>
   <button data-aba="notas"><span>📝</span>notas</button>
   <button data-aba="hoje"><span>✅</span>hoje</button>
-  <button data-aba="senhas"><span>🔑</span>senhas</button>
+  <!-- 14/11 (Lucas): aba senhas escondida — salvar senha agora é pelo navegador da nuvem (🔑 Cofre / 💾 salvar no cofre). Rota do servidor continua. -->
 </div></nav>
 
 <div class="conf" id="conf" role="dialog" aria-live="polite">
@@ -459,7 +459,7 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
   setInterval(function () { if (!document.hidden && $('aba-hoje').classList.contains('on')) carregarHoje(); }, 60000);
 
   document.addEventListener('visibilitychange', function () { if (!document.hidden) { relogio(); if ($('aba-hoje').classList.contains('on')) carregarHoje(); } });
-  irAba(['sono', 'notas', 'hoje', 'senhas'].indexOf(abaIni) >= 0 ? abaIni : 'sono');
+  irAba(['sono', 'notas', 'hoje'].indexOf(abaIni) >= 0 ? abaIni : 'sono');
 })();
 </script>
 </body>
