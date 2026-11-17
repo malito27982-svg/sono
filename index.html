@@ -88,8 +88,47 @@ textarea::placeholder { color:var(--ink3); }
 /* barra de abas */
 nav { position:fixed; left:0; right:0; bottom:0; z-index:5; display:flex; justify-content:center; padding:8px 16px calc(env(safe-area-inset-bottom) + 8px);
   background:rgba(7,11,29,.82); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border-top:1px solid var(--bord); }
-nav .in { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; width:100%; max-width:520px; }
-nav button { border:0; background:transparent; color:var(--ink3); font:inherit; font-size:12px; padding:6px 0; border-radius:14px; display:flex; flex-direction:column; align-items:center; gap:2px; }
+nav .in { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; width:100%; max-width:520px; }
+nav button { position:relative; border:0; background:transparent; color:var(--ink3); font:inherit; font-size:12px; padding:6px 0; border-radius:14px; display:flex; flex-direction:column; align-items:center; gap:2px; }
+nav .selo { position:absolute; top:2px; left:calc(50% + 8px); min-width:18px; height:18px; padding:0 5px; border-radius:9px; background:#ff5a6e; color:#fff; font-size:11px; font-weight:700; line-height:18px; text-align:center; }
+nav .selo:empty { display:none; }
+
+/* 📦 pacotes */
+.pk { background:var(--card); border:1px solid var(--bord); border-radius:18px; padding:14px; display:flex; flex-direction:column; gap:6px; cursor:pointer; }
+.pk:active { transform:scale(.985); }
+.pk .top { display:flex; justify-content:space-between; gap:10px; align-items:baseline; }
+.pk .dest { font-weight:700; font-size:16px; line-height:1.25; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+.pk .qd { flex:0 0 auto; font-variant-numeric:tabular-nums; color:#b9a8ff; font-weight:700; font-size:14px; }
+.pk .pv { color:var(--ink2); font-size:15px; line-height:1.35; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; white-space:pre-line; }
+.pk .tags { display:flex; flex-wrap:wrap; gap:6px; }
+.tag { font-size:12px; color:var(--ink2); background:rgba(255,255,255,.07); border-radius:10px; padding:3px 8px; }
+.tag.ref { background:rgba(255,179,71,.18); color:#ffcf8a; } .tag.env { background:rgba(91,227,168,.16); color:var(--ok); } .tag.err { background:rgba(255,122,138,.18); color:var(--ruim); }
+.pk.pend { opacity:.5; }
+.res { display:flex; gap:10px; align-items:flex-start; font-size:14px; color:var(--ink2); background:rgba(255,255,255,.03); border:1px solid var(--bord); border-radius:14px; padding:10px 12px; }
+.res b { color:var(--ink); font-weight:600; } .res .em { margin-left:auto; color:var(--ink3); font-variant-numeric:tabular-nums; flex:0 0 auto; }
+.folha { position:fixed; inset:0; z-index:12; background:var(--bg); display:none; flex-direction:column; }
+.folha.on { display:flex; }
+.folha .cab { display:flex; align-items:center; gap:12px; padding:calc(env(safe-area-inset-top) + 14px) 16px 12px; border-bottom:1px solid var(--bord); background:rgba(14,20,51,.95); }
+.folha .cab h3 { margin:0; font-size:19px; flex:1; line-height:1.25; }
+.folha .cab small { display:block; font-size:13px; color:var(--ink3); font-weight:400; margin-top:2px; }
+.folha .x { border:0; width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,.1); color:var(--ink); font-size:20px; flex:0 0 auto; }
+.folha .corpo { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:16px; display:flex; flex-direction:column; gap:14px; max-width:520px; width:100%; margin:0 auto; }
+.msg { background:var(--card); border:1px solid var(--bord); border-radius:18px; padding:14px; }
+.msg .para { font-size:13px; color:#b9a8ff; font-weight:700; margin-bottom:8px; }
+.msg .txt { font-size:17px; line-height:1.45; white-space:pre-wrap; word-break:break-word; -webkit-user-select:text; user-select:text; }
+.msg .txt.so { color:var(--ink3); font-style:italic; }
+.msg .anx { margin-top:10px; display:flex; flex-direction:column; gap:4px; font-size:14px; color:var(--ink2); }
+.aviso { font-size:14px; color:#ffcf8a; background:rgba(255,179,71,.12); border-radius:14px; padding:10px 12px; }
+.folha .pe { padding:12px 16px calc(env(safe-area-inset-bottom) + 12px); border-top:1px solid var(--bord); background:rgba(14,20,51,.95); }
+.folha .pe .in2 { max-width:520px; margin:0 auto; display:flex; flex-direction:column; gap:10px; }
+.tres { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.bp { border:0; border-radius:20px; min-height:74px; font:inherit; font-size:15px; font-weight:700; color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; }
+.bp span { font-size:28px; line-height:1; }
+.bp:active { transform:scale(.96); } .bp[disabled] { opacity:.4; }
+.bp.sim { background:linear-gradient(135deg,#2fbf7f,#1c8a5a); } .bp.nao { background:linear-gradient(135deg,#ff6b7d,#c93a4f); } .bp.ref { background:linear-gradient(135deg,#7b6cff,#5b4ce0); }
+.bp.larga { min-height:60px; flex-direction:row; gap:10px; font-size:18px; } .bp.larga span { font-size:22px; }
+.bp.cinza { background:rgba(255,255,255,.1); color:var(--ink); }
+.folha textarea { min-height:120px; font-size:17px; }
 nav button span { font-size:24px; line-height:1.1; filter:grayscale(.7); }
 nav button.on { color:var(--ink); background:rgba(255,255,255,.07); }
 nav button.on span { filter:none; }
@@ -164,12 +203,28 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
     <div class="nova"><input id="nova-t" placeholder="+ tarefa pra hoje" enterkeyhint="send" maxlength="300"><button id="nova-b">＋</button></div>
     <div class="atual" id="hoje-atual"></div>
   </section>
+
+  <!-- 📦 PACOTES: mensagens que a Secretaria vai mandar pra terceiros — só saem quando o Lucas toca ✅ aqui -->
+  <section class="aba" id="aba-pac">
+    <header><h1>Pacotes</h1><div class="hora" id="pac-qtd"></div></header>
+    <div class="lista" id="l-pac"></div>
+    <div class="sec" id="pac-sec-res" style="display:none">🕘 resolvidos</div>
+    <div class="lista" id="l-pac-res"></div>
+    <div class="atual" id="pac-atual"></div>
+  </section>
 </main>
+
+<div class="folha" id="folha" role="dialog">
+  <div class="cab"><h3 id="f-tit"></h3><button class="x" id="f-x" aria-label="fechar">×</button></div>
+  <div class="corpo" id="f-corpo"></div>
+  <div class="pe"><div class="in2" id="f-pe"></div></div>
+</div>
 
 <nav><div class="in">
   <button data-aba="sono"><span>😴</span>sono</button>
   <button data-aba="notas"><span>📝</span>notas</button>
   <button data-aba="hoje"><span>✅</span>hoje</button>
+  <button data-aba="pac"><span>📦</span>pacotes<i class="selo" id="pac-selo"></i></button>
   <!-- 14/11 (Lucas): aba senhas escondida — salvar senha agora é pelo navegador da nuvem (🔑 Cofre / 💾 salvar no cofre). Rota do servidor continua. -->
 </div></nav>
 
@@ -206,10 +261,11 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
   // ---------- abas ----------
   var abaIni = h.get('aba') || ls.get('app_aba') || 'sono';
   function irAba(a) {
-    ['sono', 'notas', 'hoje', 'senhas'].forEach(function (x) { $('aba-' + x).classList.toggle('on', x === a); });
+    ['sono', 'notas', 'hoje', 'senhas', 'pac'].forEach(function (x) { $('aba-' + x).classList.toggle('on', x === a); });
     document.querySelectorAll('nav button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-aba') === a); });
     ls.set('app_aba', a);
     if (a === 'hoje') carregarHoje();
+    if (a === 'pac') carregarPac();
   }
   document.querySelectorAll('nav button').forEach(function (b) { b.onclick = function () { irAba(b.getAttribute('data-aba')); }; });
 
@@ -458,8 +514,150 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
   }
   setInterval(function () { if (!document.hidden && $('aba-hoje').classList.contains('on')) carregarHoje(); }, 60000);
 
-  document.addEventListener('visibilitychange', function () { if (!document.hidden) { relogio(); if ($('aba-hoje').classList.contains('on')) carregarHoje(); } });
-  irAba(['sono', 'notas', 'hoje'].indexOf(abaIni) >= 0 ? abaIni : 'sono');
+  // ======================= 📦 PACOTES (16/11) =======================
+  // Lucas: "eu aperto, eu vejo ela inteira, e aí eu clico no X ou clico no certinho... e um botão que eu aperto e você refaz".
+  // Lista chega cifrada no tópico <T>p (chave 'hoje'); as ações vão cifradas no <T>n como pac-ok / pac-nao / pac-refaz.
+  var pac = null; try { pac = JSON.parse(ls.get('pac_cache') || 'null'); } catch (e) {}
+  var pacPend = {}; try { pacPend = JSON.parse(ls.get('pac_pend') || '{}'); } catch (e) {}
+  var NOME_ACAO = { ok: 'mandar', nao: 'não mandar', refaz: 'refazer' };
+  function quando(ms) {
+    var d = new Date(ms), hoje = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date());
+    var dia = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(d);
+    return dia === hoje ? hh(ms) : d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' }) + ' ' + hh(ms);
+  }
+  function limparPend() {
+    // pedido que a Secretaria já registrou (ação com hora >= o toque) sai dos pendentes; >15 min sem resposta também
+    if (!pac) return;
+    Object.keys(pacPend).forEach(function (c) {
+      var p = pacPend[c];
+      var viu = (pac.acoes || []).some(function (a) { return a.c === c && a.acao === p.acao && a.em >= p.em - 120000; });
+      if (viu || Date.now() - p.em > 15 * 60000) delete pacPend[c];
+    });
+    ls.set('pac_pend', JSON.stringify(pacPend));
+  }
+  function desenharPac() {
+    if (!pac) { $('l-pac').innerHTML = '<div class="vazio">carregando…</div>'; return; }
+    limparPend();
+    var lista = pac.pacotes || [];
+    var abertos = lista.filter(function (p) { var q = pacPend[p.c]; return !q || q.acao === 'refaz'; }).length;
+    $('pac-selo').textContent = abertos ? String(abertos) : '';
+    $('pac-qtd').textContent = abertos ? abertos + ' esperando' : '';
+    $('l-pac').innerHTML = lista.length ? lista.map(function (p) {
+      var q = pacPend[p.c];
+      var prev = p.itens.map(function (i) { return i.texto; }).filter(Boolean).join('\n') || '(só anexo)';
+      var nAnx = p.itens.reduce(function (s, i) { return s + (i.anexos || []).length; }, 0);
+      var tags = [];
+      if (p.itens.length > 1) tags.push('<span class="tag">' + p.itens.length + ' msgs</span>');
+      if (nAnx) tags.push('<span class="tag">📎 ' + nAnx + '</span>');
+      if (p.email) tags.push('<span class="tag">📧 e-mail</span>');
+      if (p.proc) tags.push('<span class="tag env">enviando agora…</span>');
+      if (q && q.acao !== 'refaz') tags.push('<span class="tag env">⏳ ' + (q.acao === 'ok' ? 'mandando…' : 'descartando…') + '</span>');
+      if (p.refazer || (q && q.acao === 'refaz')) tags.push('<span class="tag ref">✏️ refazendo' + (p.refazer ? ': ' + esc(p.refazer.nota.slice(0, 50)) : '') + '</span>');
+      return '<div class="pk' + (q && q.acao !== 'refaz' ? ' pend' : '') + '" data-c="' + esc(p.c) + '"><div class="top"><div class="dest">' + esc(p.dest.join(', ')) + '</div><div class="qd">' + esc(quando(p.criado)) + '</div></div>' +
+        '<div class="pv">' + esc(prev.slice(0, 300)) + '</div>' + (tags.length ? '<div class="tags">' + tags.join('') + '</div>' : '') + '</div>';
+    }).join('') : '<div class="vazio">nenhum pacote esperando 🎉</div>';
+    $('l-pac').querySelectorAll('.pk').forEach(function (x) { x.onclick = function () { abrirPac(x.getAttribute('data-c')); }; });
+    // resolvidos: o que a Secretaria registrou + o que eu toquei e ainda não voltou
+    var res = (pac.acoes || []).slice();
+    Object.keys(pacPend).forEach(function (c) { var p = pacPend[c]; res.unshift({ c: c, acao: p.acao, estado: 'pedido', msg: 'pedido enviado — a Secretaria puxa em até 30 s', nome: p.nome, em: p.em }); });
+    var IC = { mandado: '✅', descartado: '❌', refazendo: '✏️', enviando: '⏳', pedido: '⏳', erro: '⚠️' };
+    var TX = { mandado: 'mandado', descartado: 'descartado', refazendo: 'refazendo', enviando: 'mandando…', erro: 'erro' };
+    $('pac-sec-res').style.display = res.length ? '' : 'none';
+    $('l-pac-res').innerHTML = res.slice(0, 15).map(function (a) {
+      var t = a.estado === 'pedido' ? NOME_ACAO[a.acao] : TX[a.estado] || a.estado;
+      return '<div class="res"><div>' + (IC[a.estado] || '•') + '</div><div><b>' + esc(t) + '</b> · ' + esc(a.nome || a.c) + (a.msg && a.estado !== 'descartado' ? '<br>' + esc(a.msg) : '') + '</div><div class="em">' + esc(hh(a.fim || a.em)) + '</div></div>';
+    }).join('');
+    $('pac-atual').textContent = pac.ger ? 'atualizado ' + hh(pac.ger) : '';
+  }
+  var aberto = null, modo = '';
+  function abrirPac(c) {
+    var p = (pac && pac.pacotes || []).filter(function (x) { return x.c === c; })[0];
+    if (!p) return;
+    aberto = p; modo = '';
+    $('f-tit').innerHTML = esc(p.dest.join(', ')) + '<small>' + esc(quando(p.criado)) + ' · ' + p.itens.length + (p.itens.length > 1 ? ' mensagens' : ' mensagem') + '</small>';
+    var multi = p.dest.length > 1;
+    $('f-corpo').innerHTML = (p.refazer ? '<div class="aviso">✏️ você pediu pra refazer: "' + esc(p.refazer.nota) + '" — o Claude vai mandar um pacote novo e apagar este.</div>' : '') +
+      (p.email ? '<div class="aviso">📧 tem e-mail aqui — e-mail só sai com o código respondido no grupo Secretaria.</div>' : '') +
+      p.itens.map(function (i, n) {
+        return '<div class="msg">' + (multi || p.itens.length > 1 ? '<div class="para">' + (p.itens.length > 1 ? (n + 1) + '. ' : '') + esc(multi ? i.nome : '') + (multi && i.numero ? ' (' + esc(i.numero) + ')' : '') + '</div>' : '') +
+          (i.texto ? '<div class="txt">' + esc(i.texto) + '</div>' : '<div class="txt so">(sem texto — só o anexo)</div>') +
+          ((i.anexos || []).length ? '<div class="anx">' + i.anexos.map(function (a) { return '<div>' + esc(a) + '</div>'; }).join('') + '</div>' : '') + '</div>';
+      }).join('');
+    $('f-corpo').scrollTop = 0;
+    pe();
+    $('folha').classList.add('on');
+  }
+  function pe() {
+    var p = aberto; if (!p) return;
+    var trava = p.proc || !!pacPend[p.c] && pacPend[p.c].acao !== 'refaz';
+    if (modo === 'conf') {
+      $('f-pe').innerHTML = '<div class="aviso" style="text-align:center">mandar agora pra <b>' + esc(p.dest.join(', ')) + '</b>?' + (p.itens.length > 1 ? ' (' + p.itens.length + ' mensagens)' : '') + '</div>' +
+        '<button class="bp sim larga" id="p-sim2"><span>✅</span>sim, mandar</button><button class="bp cinza larga" id="p-volta">voltar</button>';
+      $('p-sim2').onclick = function () { acaoPac('ok'); };
+      $('p-volta').onclick = function () { modo = ''; pe(); };
+      return;
+    }
+    if (modo === 'ref') {
+      $('f-pe').innerHTML = '<textarea id="p-nota" class="campo" placeholder="o que está errado? ex.: tira o valor, fala que é amanhã…" maxlength="2000"></textarea>' +
+        '<button class="bp ref larga" id="p-ref2"><span>✏️</span>pedir pra refazer</button><button class="bp cinza larga" id="p-volta">voltar</button>';
+      $('p-nota').focus();
+      $('p-ref2').onclick = function () { var n = $('p-nota').value.trim(); if (!n) { $('p-nota').focus(); return; } acaoPac('refaz', n); };
+      $('p-volta').onclick = function () { modo = ''; pe(); };
+      return;
+    }
+    $('f-pe').innerHTML = '<div class="tres"><button class="bp sim" id="p-sim"' + (trava || p.email ? ' disabled' : '') + '><span>✅</span>mandar</button>' +
+      '<button class="bp nao" id="p-nao"' + (trava ? ' disabled' : '') + '><span>❌</span>não mandar</button>' +
+      '<button class="bp ref" id="p-ref"' + (trava ? ' disabled' : '') + '><span>✏️</span>refazer</button></div>';
+    $('p-sim').onclick = function () { modo = 'conf'; pe(); };
+    $('p-nao').onclick = function () { acaoPac('nao'); };
+    $('p-ref').onclick = function () { modo = 'ref'; pe(); };
+  }
+  function fecharFolha() { $('folha').classList.remove('on'); aberto = null; modo = ''; }
+  $('f-x').onclick = fecharFolha;
+  function acaoPac(acao, nota) {
+    var p = aberto; if (!p || !valido) return;
+    $('f-pe').querySelectorAll('button').forEach(function (b) { b.disabled = true; });
+    var corpo = { codigo: p.c }; if (nota) corpo.nota = nota;
+    mandarPedaco({ a: 'pac-' + acao, ts: Date.now(), n: nonce() }, enc.encode(JSON.stringify(corpo)))
+      .then(function () {
+        pacPend[p.c] = { acao: acao, em: Date.now(), nome: p.dest.join(', ') }; ls.set('pac_pend', JSON.stringify(pacPend));
+        if (navigator.vibrate) navigator.vibrate(30);
+        fecharFolha(); desenharPac();
+        $('pac-atual').textContent = acao === 'ok' ? '✅ pedido de envio mandado — confirma aqui em até 1 min' : acao === 'nao' ? '❌ não vai — some da lista em até 1 min' : '✏️ pedido de refazer anotado pro Claude';
+        setTimeout(carregarPac, 40000); setTimeout(carregarPac, 75000);
+      })
+      .catch(function (e) { $('f-pe').querySelectorAll('button').forEach(function (b) { b.disabled = false; }); alert('😕 não foi: ' + (e.message || 'sem internet') + ' — tenta de novo'); });
+  }
+  var carregandoP = false;
+  function carregarPac() {
+    desenharPac();
+    if (carregandoP || !valido) return;
+    carregandoP = true;
+    fetch('https://ntfy.sh/' + encodeURIComponent(T + 'p') + '/json?poll=1&since=latest', { cache: 'no-store', referrerPolicy: 'no-referrer' })
+      .then(function (r) { if (!r.ok) throw new Error('correio ' + r.status); return r.text(); })
+      .then(function (txt) {
+        var ev = txt.split('\n').filter(Boolean).map(function (l) { try { return JSON.parse(l); } catch (e) { return null; } })
+          .filter(function (e) { return e && e.event === 'message' && e.attachment && e.attachment.url; }).pop();
+        if (!ev) throw new Error('a Secretaria ainda não mandou a lista');
+        return fetch(ev.attachment.url, { cache: 'no-store', referrerPolicy: 'no-referrer' }).then(function (r) { if (!r.ok) throw new Error('anexo ' + r.status); return r.arrayBuffer(); });
+      })
+      .then(function (buf) { var b = new Uint8Array(buf); return chave('hoje').then(function (k) { return crypto.subtle.decrypt({ name: 'AES-GCM', iv: b.slice(0, 12) }, k, b.slice(12)); }); })
+      .then(function (claro) {
+        var d = JSON.parse(new TextDecoder().decode(claro));
+        if (!pac || !pac.ger || d.ger >= pac.ger) { pac = d; ls.set('pac_cache', JSON.stringify(d)); }
+        desenharPac();
+        if (aberto) { var ainda = (pac.pacotes || []).filter(function (x) { return x.c === aberto.c; })[0]; if (!ainda) fecharFolha(); else if (!modo) { aberto = ainda; pe(); } }
+      })
+      .catch(function (e) { desenharPac(); $('pac-atual').textContent = (pac && pac.ger ? 'atualizado ' + hh(pac.ger) + ' · ' : '') + '😕 ' + (e.message || 'sem internet'); })
+      .then(function () { carregandoP = false; });
+  }
+  // a lista atualiza a cada 30 s com a aba aberta; o selo (nº esperando) a cada 2 min com o app aberto
+  setInterval(function () { if (!document.hidden && $('aba-pac').classList.contains('on')) carregarPac(); }, 30000);
+  setInterval(function () { if (!document.hidden && !$('aba-pac').classList.contains('on')) carregarPac(); }, 120000);
+  if (valido) setTimeout(carregarPac, 800);
+
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) { relogio(); if ($('aba-hoje').classList.contains('on')) carregarHoje(); carregarPac(); } });
+  irAba(['sono', 'notas', 'hoje', 'pac'].indexOf(abaIni) >= 0 ? abaIni : 'sono');
 })();
 </script>
 </body>
