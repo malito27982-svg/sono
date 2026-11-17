@@ -103,7 +103,16 @@ nav .selo:empty { display:none; }
 .pk .tags { display:flex; flex-wrap:wrap; gap:6px; }
 .tag { font-size:12px; color:var(--ink2); background:rgba(255,255,255,.07); border-radius:10px; padding:3px 8px; }
 .tag.ref { background:rgba(255,179,71,.18); color:#ffcf8a; } .tag.env { background:rgba(91,227,168,.16); color:var(--ok); } .tag.err { background:rgba(255,122,138,.18); color:var(--ruim); }
-.pk.pend { opacity:.5; }
+.pk.ref { background:rgba(255,196,61,.16); border-color:rgba(255,196,61,.55); }
+.pk.verde { background:rgba(47,191,127,.16); border-color:rgba(91,227,168,.55); }
+.pk.verm { background:rgba(255,107,125,.15); border-color:rgba(255,122,138,.55); }
+.pk.arq { background:rgba(255,255,255,.035); filter:grayscale(1); opacity:.6; }
+.tag.est { font-weight:700; color:var(--ink); background:rgba(0,0,0,.25); }
+.pk.ref .tag.est { color:#ffd27a; } .pk.verde .tag.est { color:var(--ok); } .pk.verm .tag.est { color:#ff9aa6; }
+.arqs { margin-top:4px; } .arqs summary { color:var(--ink3); font-size:14px; padding:8px 2px; cursor:pointer; list-style:none; }
+.arqs summary::-webkit-details-marker { display:none; } .arqs[open] summary { margin-bottom:8px; }
+.puxa { text-align:center; font-size:13px; color:var(--ink2); height:0; overflow:hidden; transition:height .15s ease; margin-bottom:-16px; }
+.puxa.on { height:26px; margin-bottom:0; }
 .res { display:flex; gap:10px; align-items:flex-start; font-size:14px; color:var(--ink2); background:rgba(255,255,255,.03); border:1px solid var(--bord); border-radius:14px; padding:10px 12px; }
 .res b { color:var(--ink); font-weight:600; } .res .em { margin-left:auto; color:var(--ink3); font-variant-numeric:tabular-nums; flex:0 0 auto; }
 .folha { position:fixed; inset:0; z-index:12; background:var(--bg); display:none; flex-direction:column; }
@@ -206,11 +215,11 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
 
   <!-- 📦 PACOTES: mensagens que a Secretaria vai mandar pra terceiros — só saem quando o Lucas toca ✅ aqui -->
   <section class="aba" id="aba-pac">
+    <div class="puxa" id="pac-puxa">↓ puxa pra atualizar</div>
     <header><h1>Pacotes</h1><div class="hora" id="pac-qtd"></div></header>
     <div class="lista" id="l-pac"></div>
-    <div class="sec" id="pac-sec-res" style="display:none">🕘 resolvidos</div>
-    <div class="lista" id="l-pac-res"></div>
     <div class="atual" id="pac-atual"></div>
+    <details class="arqs" id="pac-arq" style="display:none"><summary>🗂️ arquivados (<span id="pac-arq-n">0</span>)</summary><div class="lista" id="l-pac-arq"></div></details>
   </section>
 </main>
 
@@ -516,68 +525,93 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
 
   // ======================= 📦 PACOTES (16/11) =======================
   // Lucas: "eu aperto, eu vejo ela inteira, e aí eu clico no X ou clico no certinho... e um botão que eu aperto e você refaz".
-  // Lista chega cifrada no tópico <T>p (chave 'hoje'); as ações vão cifradas no <T>n como pac-ok / pac-nao / pac-refaz.
+  // Lista chega cifrada no tópico <T>p (chave 'hoje'); as ações vão cifradas no <T>n como pac-ok / pac-nao / pac-refaz / pac-atualizar.
+  // Cores: amarelo = refazendo · verde = mandado · vermelho = não mandado (10 min) → cinza em "arquivados" (recolhido).
   var pac = null; try { pac = JSON.parse(ls.get('pac_cache') || 'null'); } catch (e) {}
   var pacPend = {}; try { pacPend = JSON.parse(ls.get('pac_pend') || '{}'); } catch (e) {}
-  var NOME_ACAO = { ok: 'mandar', nao: 'não mandar', refaz: 'refazer' };
+  var COR_MS = 10 * 60000;
   function quando(ms) {
     var d = new Date(ms), hoje = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date());
     var dia = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(d);
     return dia === hoje ? hh(ms) : d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' }) + ' ' + hh(ms);
   }
+  function ultAcao(c) { return (pac && pac.acoes || []).filter(function (a) { return a.c === c; })[0] || null; }
   function limparPend() {
-    // pedido que a Secretaria já registrou (ação com hora >= o toque) sai dos pendentes; >15 min sem resposta também
+    // toque que a Secretaria já registrou sai dos pendentes locais; >15 min sem resposta também
     if (!pac) return;
     Object.keys(pacPend).forEach(function (c) {
-      var p = pacPend[c];
-      var viu = (pac.acoes || []).some(function (a) { return a.c === c && a.acao === p.acao && a.em >= p.em - 120000; });
+      var p = pacPend[c], a = ultAcao(c), noPac = (pac.pacotes || []).filter(function (x) { return x.c === c; })[0];
+      var viu = (a && a.acao === p.acao && a.em >= p.em - 120000) || (p.acao === 'refaz' && noPac && noPac.refazer) || (p.acao !== 'refaz' && !noPac && pac.ger > p.em);
       if (viu || Date.now() - p.em > 15 * 60000) delete pacPend[c];
     });
     ls.set('pac_pend', JSON.stringify(pacPend));
   }
+  // monta os cartões: pendentes + recém resolvidos (coloridos) ; o resto vai pra "arquivados"
+  var cards = {};
+  function montarCards() {
+    var vivos = [], arq = [], vistos = {};
+    (pac.pacotes || []).forEach(function (p) {
+      vistos[p.c] = 1;
+      var q = pacPend[p.c], a = ultAcao(p.c), est = '';
+      if (q && q.acao === 'ok') est = 'enviando'; else if (q && q.acao === 'nao') est = 'descartando';
+      else if (p.proc || (a && a.acao === 'ok' && a.estado === 'enviando')) est = 'enviando';
+      else if (p.refazer || (q && q.acao === 'refaz')) est = 'refazendo';
+      var erro = a && a.estado === 'erro' && !q ? a.msg : '';
+      vivos.push({ p: p, est: est, erro: erro, vivo: true });
+    });
+    (pac.acoes || []).forEach(function (a) {
+      if (vistos[a.c] || !a.card || (a.acao !== 'ok' && a.acao !== 'nao')) return;
+      vistos[a.c] = 1;
+      var est = a.estado === 'mandado' ? 'mandado' : a.estado === 'descartado' ? 'naomandado' : a.estado === 'enviando' ? 'enviando' : 'erro';
+      var t = a.fim || a.em;
+      var x = { p: a.card, est: est, erro: est === 'erro' ? a.msg : '', msg: a.msg, quando: t };
+      if (est === 'enviando' || Date.now() - t < COR_MS) vivos.push(x); else arq.push(x);
+    });
+    var ord = function (x, y) { return (y.p.pos || y.p.criado) - (x.p.pos || x.p.criado); };
+    vivos.sort(ord); arq.sort(function (x, y) { return y.quando - x.quando; });
+    cards = {}; vivos.concat(arq).forEach(function (x) { cards[x.p.c] = x; });
+    return { vivos: vivos, arq: arq };
+  }
+  var ROT = { refazendo: '✏️ refazendo…', enviando: '⏳ mandando…', descartando: '⏳ não mandando…', mandado: '✅ mandado', naomandado: '❌ não mandado', erro: '⚠️ erro' };
+  function htmlCard(x, cinza) {
+    var p = x.p;
+    var prev = p.itens.map(function (i) { return i.texto; }).filter(Boolean).join('\n') || '(só anexo)';
+    var nAnx = p.itens.reduce(function (s, i) { return s + (i.anexos || []).length; }, 0);
+    var tags = [];
+    if (x.est) tags.push('<span class="tag est">' + ROT[x.est] + (x.est === 'mandado' || x.est === 'naomandado' ? ' ' + esc(hh(x.quando)) : '') + '</span>');
+    if (p.substitui && x.vivo && !x.est) tags.push('<span class="tag">🔁 versão nova</span>');
+    if (p.itens.length > 1) tags.push('<span class="tag">' + p.itens.length + ' msgs</span>');
+    if (nAnx) tags.push('<span class="tag">📎 ' + nAnx + '</span>');
+    if (p.email) tags.push('<span class="tag">📧 e-mail</span>');
+    if (x.erro) tags.push('<span class="tag err">⚠️ ' + esc(String(x.erro).slice(0, 80)) + '</span>');
+    var cls = cinza ? ' arq' : x.est === 'refazendo' ? ' ref' : (x.est === 'mandado' || x.est === 'enviando') ? ' verde' : (x.est === 'naomandado' || x.est === 'descartando') ? ' verm' : '';
+    return '<div class="pk' + cls + '" data-c="' + esc(p.c) + '"><div class="top"><div class="dest">' + esc(p.dest.join(', ')) + '</div><div class="qd">' + esc(quando(p.criado)) + '</div></div>' +
+      '<div class="pv">' + esc(prev.slice(0, 300)) + '</div>' + (tags.length ? '<div class="tags">' + tags.join('') + '</div>' : '') + '</div>';
+  }
   function desenharPac() {
     if (!pac) { $('l-pac').innerHTML = '<div class="vazio">carregando…</div>'; return; }
     limparPend();
-    var lista = pac.pacotes || [];
-    var abertos = lista.filter(function (p) { var q = pacPend[p.c]; return !q || q.acao === 'refaz'; }).length;
-    $('pac-selo').textContent = abertos ? String(abertos) : '';
-    $('pac-qtd').textContent = abertos ? abertos + ' esperando' : '';
-    $('l-pac').innerHTML = lista.length ? lista.map(function (p) {
-      var q = pacPend[p.c];
-      var prev = p.itens.map(function (i) { return i.texto; }).filter(Boolean).join('\n') || '(só anexo)';
-      var nAnx = p.itens.reduce(function (s, i) { return s + (i.anexos || []).length; }, 0);
-      var tags = [];
-      if (p.itens.length > 1) tags.push('<span class="tag">' + p.itens.length + ' msgs</span>');
-      if (nAnx) tags.push('<span class="tag">📎 ' + nAnx + '</span>');
-      if (p.email) tags.push('<span class="tag">📧 e-mail</span>');
-      if (p.proc) tags.push('<span class="tag env">enviando agora…</span>');
-      if (q && q.acao !== 'refaz') tags.push('<span class="tag env">⏳ ' + (q.acao === 'ok' ? 'mandando…' : 'descartando…') + '</span>');
-      if (p.refazer || (q && q.acao === 'refaz')) tags.push('<span class="tag ref">✏️ refazendo' + (p.refazer ? ': ' + esc(p.refazer.nota.slice(0, 50)) : '') + '</span>');
-      return '<div class="pk' + (q && q.acao !== 'refaz' ? ' pend' : '') + '" data-c="' + esc(p.c) + '"><div class="top"><div class="dest">' + esc(p.dest.join(', ')) + '</div><div class="qd">' + esc(quando(p.criado)) + '</div></div>' +
-        '<div class="pv">' + esc(prev.slice(0, 300)) + '</div>' + (tags.length ? '<div class="tags">' + tags.join('') + '</div>' : '') + '</div>';
-    }).join('') : '<div class="vazio">nenhum pacote esperando 🎉</div>';
-    $('l-pac').querySelectorAll('.pk').forEach(function (x) { x.onclick = function () { abrirPac(x.getAttribute('data-c')); }; });
-    // resolvidos: o que a Secretaria registrou + o que eu toquei e ainda não voltou
-    var res = (pac.acoes || []).slice();
-    Object.keys(pacPend).forEach(function (c) { var p = pacPend[c]; res.unshift({ c: c, acao: p.acao, estado: 'pedido', msg: 'pedido enviado — a Secretaria puxa em até 30 s', nome: p.nome, em: p.em }); });
-    var IC = { mandado: '✅', descartado: '❌', refazendo: '✏️', enviando: '⏳', pedido: '⏳', erro: '⚠️' };
-    var TX = { mandado: 'mandado', descartado: 'descartado', refazendo: 'refazendo', enviando: 'mandando…', erro: 'erro' };
-    $('pac-sec-res').style.display = res.length ? '' : 'none';
-    $('l-pac-res').innerHTML = res.slice(0, 15).map(function (a) {
-      var t = a.estado === 'pedido' ? NOME_ACAO[a.acao] : TX[a.estado] || a.estado;
-      return '<div class="res"><div>' + (IC[a.estado] || '•') + '</div><div><b>' + esc(t) + '</b> · ' + esc(a.nome || a.c) + (a.msg && a.estado !== 'descartado' ? '<br>' + esc(a.msg) : '') + '</div><div class="em">' + esc(hh(a.fim || a.em)) + '</div></div>';
-    }).join('');
-    $('pac-atual').textContent = pac.ger ? 'atualizado ' + hh(pac.ger) : '';
+    var m = montarCards();
+    var esperando = m.vivos.filter(function (x) { return x.vivo && (!x.est || x.est === 'refazendo'); }).length;
+    $('pac-selo').textContent = esperando ? String(esperando) : '';
+    $('pac-qtd').textContent = esperando ? esperando + ' esperando' : '';
+    $('l-pac').innerHTML = m.vivos.length ? m.vivos.map(function (x) { return htmlCard(x, false); }).join('') : '<div class="vazio">nenhum pacote esperando 🎉</div>';
+    $('pac-arq').style.display = m.arq.length ? '' : 'none';
+    $('pac-arq-n').textContent = m.arq.length;
+    $('l-pac-arq').innerHTML = m.arq.map(function (x) { return htmlCard(x, true); }).join('');
+    document.querySelectorAll('#l-pac .pk, #l-pac-arq .pk').forEach(function (el) { el.onclick = function () { abrirPac(el.getAttribute('data-c')); }; });
+    $('pac-atual').textContent = pac.ger ? 'atualizado ' + hh(pac.ger) + ' · puxa a tela pra baixo pra atualizar' : '';
   }
   var aberto = null, modo = '';
   function abrirPac(c) {
-    var p = (pac && pac.pacotes || []).filter(function (x) { return x.c === c; })[0];
-    if (!p) return;
-    aberto = p; modo = '';
-    $('f-tit').innerHTML = esc(p.dest.join(', ')) + '<small>' + esc(quando(p.criado)) + ' · ' + p.itens.length + (p.itens.length > 1 ? ' mensagens' : ' mensagem') + '</small>';
+    var x = cards[c]; if (!x) return;
+    var p = x.p;
+    aberto = x; modo = '';
+    $('f-tit').innerHTML = esc(p.dest.join(', ')) + '<small>' + esc(quando(p.criado)) + ' · ' + p.itens.length + (p.itens.length > 1 ? ' mensagens' : ' mensagem') + (x.est ? ' · ' + ROT[x.est] : '') + '</small>';
     var multi = p.dest.length > 1;
-    $('f-corpo').innerHTML = (p.refazer ? '<div class="aviso">✏️ você pediu pra refazer: "' + esc(p.refazer.nota) + '" — o Claude vai mandar um pacote novo e apagar este.</div>' : '') +
-      (p.email ? '<div class="aviso">📧 tem e-mail aqui — e-mail só sai com o código respondido no grupo Secretaria.</div>' : '') +
+    $('f-corpo').innerHTML = (p.refazer ? '<div class="aviso">✏️ você pediu pra refazer: "' + esc(p.refazer.nota) + '" — a versão nova entra no lugar deste cartão.</div>' : '') +
+      (x.msg && !x.vivo ? '<div class="aviso">' + esc(x.msg) + '</div>' : '') +
+      (p.email && x.vivo ? '<div class="aviso">📧 tem e-mail aqui — e-mail só sai com o código respondido no grupo Secretaria.</div>' : '') +
       p.itens.map(function (i, n) {
         return '<div class="msg">' + (multi || p.itens.length > 1 ? '<div class="para">' + (p.itens.length > 1 ? (n + 1) + '. ' : '') + esc(multi ? i.nome : '') + (multi && i.numero ? ' (' + esc(i.numero) + ')' : '') + '</div>' : '') +
           (i.texto ? '<div class="txt">' + esc(i.texto) + '</div>' : '<div class="txt so">(sem texto — só o anexo)</div>') +
@@ -588,8 +622,10 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
     $('folha').classList.add('on');
   }
   function pe() {
-    var p = aberto; if (!p) return;
-    var trava = p.proc || !!pacPend[p.c] && pacPend[p.c].acao !== 'refaz';
+    var x = aberto; if (!x) return;
+    var p = x.p;
+    if (!x.vivo) { $('f-pe').innerHTML = '<button class="bp cinza larga" id="p-volta"><span>←</span>voltar</button>'; $('p-volta').onclick = fecharFolha; return; }
+    var trava = x.est === 'enviando' || x.est === 'descartando';
     if (modo === 'conf') {
       $('f-pe').innerHTML = '<div class="aviso" style="text-align:center">mandar agora pra <b>' + esc(p.dest.join(', ')) + '</b>?' + (p.itens.length > 1 ? ' (' + p.itens.length + ' mensagens)' : '') + '</div>' +
         '<button class="bp sim larga" id="p-sim2"><span>✅</span>sim, mandar</button><button class="bp cinza larga" id="p-volta">voltar</button>';
@@ -615,23 +651,24 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
   function fecharFolha() { $('folha').classList.remove('on'); aberto = null; modo = ''; }
   $('f-x').onclick = fecharFolha;
   function acaoPac(acao, nota) {
-    var p = aberto; if (!p || !valido) return;
+    var x = aberto; if (!x || !valido) return;
+    var p = x.p;
     $('f-pe').querySelectorAll('button').forEach(function (b) { b.disabled = true; });
     var corpo = { codigo: p.c }; if (nota) corpo.nota = nota;
     mandarPedaco({ a: 'pac-' + acao, ts: Date.now(), n: nonce() }, enc.encode(JSON.stringify(corpo)))
       .then(function () {
-        pacPend[p.c] = { acao: acao, em: Date.now(), nome: p.dest.join(', ') }; ls.set('pac_pend', JSON.stringify(pacPend));
+        pacPend[p.c] = { acao: acao, em: Date.now() }; ls.set('pac_pend', JSON.stringify(pacPend));
         if (navigator.vibrate) navigator.vibrate(30);
         fecharFolha(); desenharPac();
-        $('pac-atual').textContent = acao === 'ok' ? '✅ pedido de envio mandado — confirma aqui em até 1 min' : acao === 'nao' ? '❌ não vai — some da lista em até 1 min' : '✏️ pedido de refazer anotado pro Claude';
-        setTimeout(carregarPac, 40000); setTimeout(carregarPac, 75000);
+        $('pac-atual').textContent = acao === 'ok' ? '✅ mandando — fica verde aqui' : acao === 'nao' ? '❌ não vai — fica vermelho e depois arquiva' : '✏️ pedido de refazer anotado — a versão nova entra no lugar';
+        setTimeout(carregarPac, 35000); setTimeout(carregarPac, 70000);
       })
       .catch(function (e) { $('f-pe').querySelectorAll('button').forEach(function (b) { b.disabled = false; }); alert('😕 não foi: ' + (e.message || 'sem internet') + ' — tenta de novo'); });
   }
   var carregandoP = false;
-  function carregarPac() {
+  function carregarPac(cb) {
     desenharPac();
-    if (carregandoP || !valido) return;
+    if (carregandoP || !valido) { if (cb) cb(); return; }
     carregandoP = true;
     fetch('https://ntfy.sh/' + encodeURIComponent(T + 'p') + '/json?poll=1&since=latest', { cache: 'no-store', referrerPolicy: 'no-referrer' })
       .then(function (r) { if (!r.ok) throw new Error('correio ' + r.status); return r.text(); })
@@ -644,13 +681,42 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
       .then(function (buf) { var b = new Uint8Array(buf); return chave('hoje').then(function (k) { return crypto.subtle.decrypt({ name: 'AES-GCM', iv: b.slice(0, 12) }, k, b.slice(12)); }); })
       .then(function (claro) {
         var d = JSON.parse(new TextDecoder().decode(claro));
-        if (!pac || !pac.ger || d.ger >= pac.ger) { pac = d; ls.set('pac_cache', JSON.stringify(d)); }
+        if (!pac || !pac.ger || d.ger >= pac.ger || pac.v !== d.v) { pac = d; ls.set('pac_cache', JSON.stringify(d)); }
         desenharPac();
-        if (aberto) { var ainda = (pac.pacotes || []).filter(function (x) { return x.c === aberto.c; })[0]; if (!ainda) fecharFolha(); else if (!modo) { aberto = ainda; pe(); } }
+        if (aberto && aberto.vivo && !modo) { var ainda = cards[aberto.p.c]; if (!ainda || !ainda.vivo) fecharFolha(); else { aberto = ainda; pe(); } }
       })
       .catch(function (e) { desenharPac(); $('pac-atual').textContent = (pac && pac.ger ? 'atualizado ' + hh(pac.ger) + ' · ' : '') + '😕 ' + (e.message || 'sem internet'); })
-      .then(function () { carregandoP = false; });
+      .then(function () { carregandoP = false; if (cb) cb(); });
   }
+  // 🔄 puxar a tela pra baixo = atualizar na hora (pede republicação à Secretaria, no máx. 1 a cada 20 s)
+  var ultPedido = 0;
+  function atualizarJa() {
+    $('pac-puxa').textContent = '↻ atualizando…'; $('pac-puxa').classList.add('on');
+    var fim = function () { setTimeout(function () { $('pac-puxa').classList.remove('on'); }, 600); };
+    if (valido && Date.now() - ultPedido > 20000) {
+      ultPedido = Date.now();
+      mandarPedaco({ a: 'pac-atualizar', ts: Date.now(), n: nonce() }, enc.encode('{}')).catch(function () {});
+      setTimeout(function () { carregarPac(); }, 8000); setTimeout(function () { carregarPac(); }, 40000);
+    }
+    carregarPac(fim);
+  }
+  (function () {
+    var y0 = null, puxou = false;
+    document.addEventListener('touchstart', function (e) {
+      if (!$('aba-pac').classList.contains('on') || $('folha').classList.contains('on') || window.scrollY > 0) { y0 = null; return; }
+      y0 = e.touches[0].clientY; puxou = false;
+    }, { passive: true });
+    document.addEventListener('touchmove', function (e) {
+      if (y0 == null) return;
+      var dy = e.touches[0].clientY - y0;
+      if (dy > 20 && window.scrollY <= 0) { $('pac-puxa').classList.add('on'); puxou = dy > 80; $('pac-puxa').textContent = puxou ? '↻ solta pra atualizar' : '↓ puxa pra atualizar'; }
+    }, { passive: true });
+    document.addEventListener('touchend', function () {
+      if (y0 == null) return; y0 = null;
+      if (puxou) atualizarJa(); else $('pac-puxa').classList.remove('on');
+      puxou = false;
+    }, { passive: true });
+  })();
   // a lista atualiza a cada 30 s com a aba aberta; o selo (nº esperando) a cada 2 min com o app aberto
   setInterval(function () { if (!document.hidden && $('aba-pac').classList.contains('on')) carregarPac(); }, 30000);
   setInterval(function () { if (!document.hidden && !$('aba-pac').classList.contains('on')) carregarPac(); }, 120000);
