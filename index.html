@@ -103,6 +103,17 @@ nav .selo:empty { display:none; }
 .pk .tags { display:flex; flex-wrap:wrap; gap:6px; }
 .tag { font-size:12px; color:var(--ink2); background:rgba(255,255,255,.07); border-radius:10px; padding:3px 8px; }
 .tag.ref { background:rgba(255,179,71,.18); color:#ffcf8a; } .tag.env { background:rgba(91,227,168,.16); color:var(--ok); } .tag.err { background:rgba(255,122,138,.18); color:var(--ruim); }
+.pk .cabeca { display:flex; flex-direction:column; gap:6px; }
+.pk .seta { font-style:normal; color:var(--ink3); margin-left:4px; }
+.pk.aberto { cursor:default; } .pk.aberto:active { transform:none; }
+.pk .corpo-pk { display:flex; flex-direction:column; gap:12px; margin-top:8px; padding-top:12px; border-top:1px solid var(--bord); }
+.pk .msg { background:rgba(0,0,0,.18); }
+.pk .foto { display:block; width:100%; border-radius:14px; margin-top:4px; }
+.pk .arq { display:flex; align-items:center; justify-content:space-between; gap:10px; background:rgba(255,255,255,.06); border-radius:12px; padding:10px 12px; }
+.pk .arq small { color:var(--ink3); margin-left:6px; }
+.pk .abrir { flex:0 0 auto; border:0; border-radius:12px; background:#5b4ce0; color:#fff; font:inherit; font-size:15px; font-weight:700; padding:10px 16px; }
+.duas { display:grid; grid-template-columns:1fr 1.4fr; gap:10px; }
+.pk textarea { min-height:110px; font-size:17px; }
 .pk.ref { background:rgba(255,196,61,.16); border-color:rgba(255,196,61,.55); }
 .pk.verde { background:rgba(47,191,127,.16); border-color:rgba(91,227,168,.55); }
 .pk.verm { background:rgba(255,107,125,.15); border-color:rgba(255,122,138,.55); }
@@ -223,11 +234,7 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
   </section>
 </main>
 
-<div class="folha" id="folha" role="dialog">
-  <div class="cab"><h3 id="f-tit"></h3><button class="x" id="f-x" aria-label="fechar">×</button></div>
-  <div class="corpo" id="f-corpo"></div>
-  <div class="pe"><div class="in2" id="f-pe"></div></div>
-</div>
+
 
 <nav><div class="in">
   <button data-aba="sono"><span>😴</span>sono</button>
@@ -573,22 +580,8 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
     return { vivos: vivos, arq: arq };
   }
   var ROT = { refazendo: '✏️ refazendo…', enviando: '⏳ mandando…', descartando: '⏳ não mandando…', mandado: '✅ mandado', naomandado: '❌ não mandado', erro: '⚠️ erro' };
-  function htmlCard(x, cinza) {
-    var p = x.p;
-    var prev = p.itens.map(function (i) { return i.texto; }).filter(Boolean).join('\n') || '(só anexo)';
-    var nAnx = p.itens.reduce(function (s, i) { return s + (i.anexos || []).length; }, 0);
-    var tags = [];
-    if (x.est) tags.push('<span class="tag est">' + ROT[x.est] + (x.est === 'mandado' || x.est === 'naomandado' ? ' ' + esc(hh(x.quando)) : '') + '</span>');
-    if (p.substitui && x.vivo && !x.est) tags.push('<span class="tag">🔁 versão nova</span>');
-    if (p.itens.length > 1) tags.push('<span class="tag">' + p.itens.length + ' msgs</span>');
-    if (nAnx) tags.push('<span class="tag">📎 ' + nAnx + '</span>');
-    if (p.email) tags.push('<span class="tag">📧 e-mail</span>');
-    if (x.erro) tags.push('<span class="tag err">⚠️ ' + esc(String(x.erro).slice(0, 80)) + '</span>');
-    var cls = cinza ? ' arq' : x.est === 'refazendo' ? ' ref' : (x.est === 'mandado' || x.est === 'enviando') ? ' verde' : (x.est === 'naomandado' || x.est === 'descartando') ? ' verm' : '';
-    return '<div class="pk' + cls + '" data-c="' + esc(p.c) + '"><div class="top"><div class="dest">' + esc(p.dest.join(', ')) + '</div><div class="qd">' + esc(quando(p.criado)) + '</div></div>' +
-      '<div class="pv">' + esc(prev.slice(0, 300)) + '</div>' + (tags.length ? '<div class="tags">' + tags.join('') + '</div>' : '') + '</div>';
-  }
   function desenharPac() {
+    if (modo === 'ref' && document.activeElement && document.activeElement.id === 'p-nota') return; // não apaga o que ele está digitando
     if (!pac) { $('l-pac').innerHTML = '<div class="vazio">carregando…</div>'; return; }
     limparPend();
     var m = montarCards();
@@ -599,71 +592,110 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
     $('pac-arq').style.display = m.arq.length ? '' : 'none';
     $('pac-arq-n').textContent = m.arq.length;
     $('l-pac-arq').innerHTML = m.arq.map(function (x) { return htmlCard(x, true); }).join('');
-    document.querySelectorAll('#l-pac .pk, #l-pac-arq .pk').forEach(function (el) { el.onclick = function () { abrirPac(el.getAttribute('data-c')); }; });
+    ligarCards();
     $('pac-atual').textContent = pac.ger ? 'atualizado ' + hh(pac.ger) + ' · puxa a tela pra baixo pra atualizar' : '';
   }
-  var aberto = null, modo = '';
-  function abrirPac(c) {
-    var x = cards[c]; if (!x) return;
-    var p = x.p;
-    aberto = x; modo = '';
-    $('f-tit').innerHTML = esc(p.dest.join(', ')) + '<small>' + esc(quando(p.criado)) + ' · ' + p.itens.length + (p.itens.length > 1 ? ' mensagens' : ' mensagem') + (x.est ? ' · ' + ROT[x.est] : '') + '</small>';
-    var multi = p.dest.length > 1;
-    $('f-corpo').innerHTML = (p.refazer ? '<div class="aviso">✏️ você pediu pra refazer: "' + esc(p.refazer.nota) + '" — a versão nova entra no lugar deste cartão.</div>' : '') +
+  // cartão = acordeão: tocar no topo abre ALI MESMO (mensagens inteiras + fotos + anexos + ✅ ❌ ✏️); tocar de novo recolhe
+  var abertoC = null, modo = '', rascRef = '';
+  function htmlAnexos(i, vivo) {
+    var arqs = i.arqs || [], md = (pac && pac.midia) || {};
+    if (!arqs.length) return (i.anexos || []).length ? '<div class="anx">' + i.anexos.map(function (a) { return '<div>' + esc(a) + '</div>'; }).join('') + '</div>' : '';
+    return '<div class="anx">' + arqs.map(function (a) {
+      var m = a.id && vivo ? md[a.id] : null;
+      if (a.tipo === 'foto' && m && m.thumb) return '<img class="foto" src="' + m.thumb + '" alt="' + esc(a.nome) + '">';
+      var btn = m && m.url ? '<button class="abrir" data-id="' + esc(a.id) + '" data-nome="' + esc(a.nome) + '">abrir</button>' : '';
+      var info = a.falta ? ' · arquivo sumiu do PC' : m && m.grande ? ' · grande demais pro app' : m && m.erro ? ' · não subiu (' + esc(m.erro) + ')' : (!m && vivo ? ' · carregando…' : '');
+      return '<div class="arq"><span>' + (a.tipo === 'foto' ? '📷 ' : '📎 ') + esc(a.nome) + (a.kb ? ' <small>' + a.kb + ' KB</small>' : '') + '<small>' + info + '</small></span>' + btn + '</div>';
+    }).join('') + '</div>';
+  }
+  function htmlCorpo(x) {
+    var p = x.p, multi = p.dest.length > 1;
+    var h = (p.refazer ? '<div class="aviso">✏️ você pediu pra refazer: "' + esc(p.refazer.nota) + '" — a versão nova entra no lugar deste cartão.</div>' : '') +
       (x.msg && !x.vivo ? '<div class="aviso">' + esc(x.msg) + '</div>' : '') +
       (p.email && x.vivo ? '<div class="aviso">📧 tem e-mail aqui — e-mail só sai com o código respondido no grupo Secretaria.</div>' : '') +
       p.itens.map(function (i, n) {
         return '<div class="msg">' + (multi || p.itens.length > 1 ? '<div class="para">' + (p.itens.length > 1 ? (n + 1) + '. ' : '') + esc(multi ? i.nome : '') + (multi && i.numero ? ' (' + esc(i.numero) + ')' : '') + '</div>' : '') +
-          (i.texto ? '<div class="txt">' + esc(i.texto) + '</div>' : '<div class="txt so">(sem texto — só o anexo)</div>') +
-          ((i.anexos || []).length ? '<div class="anx">' + i.anexos.map(function (a) { return '<div>' + esc(a) + '</div>'; }).join('') + '</div>' : '') + '</div>';
+          (i.texto ? '<div class="txt">' + esc(i.texto) + '</div>' : '<div class="txt so">(sem texto — só o anexo)</div>') + htmlAnexos(i, x.vivo) + '</div>';
       }).join('');
-    $('f-corpo').scrollTop = 0;
-    pe();
-    $('folha').classList.add('on');
-  }
-  function pe() {
-    var x = aberto; if (!x) return;
-    var p = x.p;
-    if (!x.vivo) { $('f-pe').innerHTML = '<button class="bp cinza larga" id="p-volta"><span>←</span>voltar</button>'; $('p-volta').onclick = fecharFolha; return; }
+    if (!x.vivo) return h;
     var trava = x.est === 'enviando' || x.est === 'descartando';
-    if (modo === 'conf') {
-      $('f-pe').innerHTML = '<div class="aviso" style="text-align:center">mandar agora pra <b>' + esc(p.dest.join(', ')) + '</b>?' + (p.itens.length > 1 ? ' (' + p.itens.length + ' mensagens)' : '') + '</div>' +
-        '<button class="bp sim larga" id="p-sim2"><span>✅</span>sim, mandar</button><button class="bp cinza larga" id="p-volta">voltar</button>';
-      $('p-sim2').onclick = function () { acaoPac('ok'); };
-      $('p-volta').onclick = function () { modo = ''; pe(); };
-      return;
-    }
-    if (modo === 'ref') {
-      $('f-pe').innerHTML = '<textarea id="p-nota" class="campo" placeholder="o que está errado? ex.: tira o valor, fala que é amanhã…" maxlength="2000"></textarea>' +
-        '<button class="bp ref larga" id="p-ref2"><span>✏️</span>pedir pra refazer</button><button class="bp cinza larga" id="p-volta">voltar</button>';
-      $('p-nota').focus();
-      $('p-ref2').onclick = function () { var n = $('p-nota').value.trim(); if (!n) { $('p-nota').focus(); return; } acaoPac('refaz', n); };
-      $('p-volta').onclick = function () { modo = ''; pe(); };
-      return;
-    }
-    $('f-pe').innerHTML = '<div class="tres"><button class="bp sim" id="p-sim"' + (trava || p.email ? ' disabled' : '') + '><span>✅</span>mandar</button>' +
-      '<button class="bp nao" id="p-nao"' + (trava ? ' disabled' : '') + '><span>❌</span>não mandar</button>' +
-      '<button class="bp ref" id="p-ref"' + (trava ? ' disabled' : '') + '><span>✏️</span>refazer</button></div>';
-    $('p-sim').onclick = function () { modo = 'conf'; pe(); };
-    $('p-nao').onclick = function () { acaoPac('nao'); };
-    $('p-ref').onclick = function () { modo = 'ref'; pe(); };
+    if (modo === 'conf') return h + '<div class="aviso" style="text-align:center">mandar agora pra <b>' + esc(p.dest.join(', ')) + '</b>?' + (p.itens.length > 1 ? ' (' + p.itens.length + ' mensagens)' : '') + '</div>' +
+      '<div class="duas"><button class="bp cinza larga" data-b="volta">voltar</button><button class="bp sim larga" data-b="sim2"><span>✅</span>sim, mandar</button></div>';
+    if (modo === 'ref') return h + '<textarea id="p-nota" class="campo" placeholder="o que está errado? ex.: tira o valor, fala que é amanhã…" maxlength="2000">' + esc(rascRef) + '</textarea>' +
+      '<div class="duas"><button class="bp cinza larga" data-b="volta">voltar</button><button class="bp ref larga" data-b="ref2"><span>✏️</span>refazer</button></div>';
+    return h + '<div class="tres"><button class="bp sim" data-b="sim"' + (trava || p.email ? ' disabled' : '') + '><span>✅</span>mandar</button>' +
+      '<button class="bp nao" data-b="nao"' + (trava ? ' disabled' : '') + '><span>❌</span>não mandar</button>' +
+      '<button class="bp ref" data-b="ref"' + (trava ? ' disabled' : '') + '><span>✏️</span>refazer</button></div>';
   }
-  function fecharFolha() { $('folha').classList.remove('on'); aberto = null; modo = ''; }
-  $('f-x').onclick = fecharFolha;
-  function acaoPac(acao, nota) {
-    var x = aberto; if (!x || !valido) return;
-    var p = x.p;
-    $('f-pe').querySelectorAll('button').forEach(function (b) { b.disabled = true; });
-    var corpo = { codigo: p.c }; if (nota) corpo.nota = nota;
+  function htmlCard(x, cinza) {
+    var p = x.p, aberto = abertoC === p.c;
+    var prev = p.itens.map(function (i) { return i.texto; }).filter(Boolean).join('\n') || '(só anexo)';
+    var nAnx = p.itens.reduce(function (s, i) { return s + (i.anexos || []).length; }, 0);
+    var tags = [];
+    if (x.est) tags.push('<span class="tag est">' + ROT[x.est] + (x.est === 'mandado' || x.est === 'naomandado' ? ' ' + esc(hh(x.quando)) : '') + '</span>');
+    if (p.substitui && x.vivo && !x.est) tags.push('<span class="tag">🔁 versão nova</span>');
+    if (p.itens.length > 1) tags.push('<span class="tag">' + p.itens.length + ' msgs</span>');
+    if (nAnx) tags.push('<span class="tag">📎 ' + nAnx + '</span>');
+    if (p.email) tags.push('<span class="tag">📧 e-mail</span>');
+    if (x.erro) tags.push('<span class="tag err">⚠️ ' + esc(String(x.erro).slice(0, 80)) + '</span>');
+    var cls = cinza ? ' arq' : x.est === 'refazendo' ? ' ref' : (x.est === 'mandado' || x.est === 'enviando') ? ' verde' : (x.est === 'naomandado' || x.est === 'descartando') ? ' verm' : '';
+    return '<div class="pk' + cls + (aberto ? ' aberto' : '') + '" data-c="' + esc(p.c) + '"><div class="cabeca"><div class="top"><div class="dest">' + esc(p.dest.join(', ')) + '</div><div class="qd">' + esc(quando(p.criado)) + ' <i class="seta">' + (aberto ? '▴' : '▾') + '</i></div></div>' +
+      (aberto ? '' : '<div class="pv">' + esc(prev.slice(0, 300)) + '</div>') + (tags.length ? '<div class="tags">' + tags.join('') + '</div>' : '') + '</div>' +
+      (aberto ? '<div class="corpo-pk">' + htmlCorpo(x) + '</div>' : '') + '</div>';
+  }
+  function ligarCards() {
+    document.querySelectorAll('#l-pac .pk, #l-pac-arq .pk').forEach(function (el) {
+      var c = el.getAttribute('data-c');
+      el.querySelector('.cabeca').onclick = function () { abrirPac(c); };
+      el.querySelectorAll('[data-b]').forEach(function (b) { b.onclick = function () { botao(c, b.getAttribute('data-b')); }; });
+      el.querySelectorAll('.abrir').forEach(function (b) { b.onclick = function () { abrirAnexo(b); }; });
+      var nt = el.querySelector('#p-nota'); if (nt) nt.oninput = function () { rascRef = nt.value; };
+    });
+  }
+  function abrirPac(c) {
+    if (abertoC === c) { abertoC = null; modo = ''; } else { abertoC = c; modo = ''; rascRef = ''; }
+    desenharPac();
+    if (abertoC) { var el = document.querySelector('.pk[data-c="' + abertoC + '"]'); if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+  }
+  function botao(c, b) {
+    if (b === 'sim') modo = 'conf';
+    else if (b === 'ref') modo = 'ref';
+    else if (b === 'volta') modo = '';
+    else if (b === 'nao') return acaoPac(c, 'nao');
+    else if (b === 'sim2') return acaoPac(c, 'ok');
+    else if (b === 'ref2') { var n = rascRef.trim(); if (!n) { var t = $('p-nota'); if (t) t.focus(); return; } return acaoPac(c, 'refaz', n); }
+    desenharPac();
+    if (modo === 'ref') { var t2 = $('p-nota'); if (t2) t2.focus(); }
+  }
+  function abrirAnexo(b) {
+    var id = b.getAttribute('data-id'), nome = b.getAttribute('data-nome'), m = (pac && pac.midia || {})[id];
+    if (!m || !m.url) return;
+    var janela = window.open('', '_blank'); // abre já (iPhone bloqueia janela aberta depois de esperar)
+    b.textContent = 'baixando…'; b.disabled = true;
+    fetch(m.url, { cache: 'no-store', referrerPolicy: 'no-referrer' })
+      .then(function (r) { if (!r.ok) throw new Error(r.status === 404 ? 'expirou — puxa a tela pra atualizar' : 'anexo ' + r.status); return r.arrayBuffer(); })
+      .then(function (buf) { var x = new Uint8Array(buf); return chave('hoje').then(function (k) { return crypto.subtle.decrypt({ name: 'AES-GCM', iv: x.slice(0, 12) }, k, x.slice(12)); }); })
+      .then(function (claro) {
+        var u = URL.createObjectURL(new Blob([claro], { type: m.mime || 'application/octet-stream' }));
+        if (janela) janela.location.href = u; else { var a = document.createElement('a'); a.href = u; a.download = nome; a.target = '_blank'; document.body.appendChild(a); a.click(); a.remove(); }
+        b.textContent = 'abrir'; b.disabled = false;
+      })
+      .catch(function (e) { if (janela) janela.close(); b.textContent = 'abrir'; b.disabled = false; alert('😕 ' + (e.message || 'não abriu')); });
+  }
+  function acaoPac(c, acao, nota) {
+    if (!valido) return;
+    var el = document.querySelector('.pk[data-c="' + c + '"]');
+    if (el) el.querySelectorAll('[data-b]').forEach(function (b) { b.disabled = true; });
+    var corpo = { codigo: c }; if (nota) corpo.nota = nota;
     mandarPedaco({ a: 'pac-' + acao, ts: Date.now(), n: nonce() }, enc.encode(JSON.stringify(corpo)))
       .then(function () {
-        pacPend[p.c] = { acao: acao, em: Date.now() }; ls.set('pac_pend', JSON.stringify(pacPend));
+        pacPend[c] = { acao: acao, em: Date.now() }; ls.set('pac_pend', JSON.stringify(pacPend));
         if (navigator.vibrate) navigator.vibrate(30);
-        fecharFolha(); desenharPac();
+        abertoC = null; modo = ''; rascRef = ''; desenharPac();
         $('pac-atual').textContent = acao === 'ok' ? '✅ mandando — fica verde aqui' : acao === 'nao' ? '❌ não vai — fica vermelho e depois arquiva' : '✏️ pedido de refazer anotado — a versão nova entra no lugar';
         setTimeout(carregarPac, 35000); setTimeout(carregarPac, 70000);
       })
-      .catch(function (e) { $('f-pe').querySelectorAll('button').forEach(function (b) { b.disabled = false; }); alert('😕 não foi: ' + (e.message || 'sem internet') + ' — tenta de novo'); });
+      .catch(function (e) { if (el) el.querySelectorAll('[data-b]').forEach(function (b) { b.disabled = false; }); alert('😕 não foi: ' + (e.message || 'sem internet') + ' — tenta de novo'); });
   }
   var carregandoP = false;
   function carregarPac(cb) {
@@ -683,7 +715,7 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
         var d = JSON.parse(new TextDecoder().decode(claro));
         if (!pac || !pac.ger || d.ger >= pac.ger || pac.v !== d.v) { pac = d; ls.set('pac_cache', JSON.stringify(d)); }
         desenharPac();
-        if (aberto && aberto.vivo && !modo) { var ainda = cards[aberto.p.c]; if (!ainda || !ainda.vivo) fecharFolha(); else { aberto = ainda; pe(); } }
+        if (abertoC && !cards[abertoC]) { abertoC = null; modo = ''; desenharPac(); }
       })
       .catch(function (e) { desenharPac(); $('pac-atual').textContent = (pac && pac.ger ? 'atualizado ' + hh(pac.ger) + ' · ' : '') + '😕 ' + (e.message || 'sem internet'); })
       .then(function () { carregandoP = false; if (cb) cb(); });
@@ -703,7 +735,7 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
   (function () {
     var y0 = null, puxou = false;
     document.addEventListener('touchstart', function (e) {
-      if (!$('aba-pac').classList.contains('on') || $('folha').classList.contains('on') || window.scrollY > 0) { y0 = null; return; }
+      if (!$('aba-pac').classList.contains('on') || window.scrollY > 0) { y0 = null; return; }
       y0 = e.touches[0].clientY; puxou = false;
     }, { passive: true });
     document.addEventListener('touchmove', function (e) {
