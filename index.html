@@ -757,10 +757,10 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
   function atualizarJa() {
     $('pac-puxa').textContent = '↻ atualizando…'; $('pac-puxa').classList.add('on');
     var fim = function () { setTimeout(function () { $('pac-puxa').classList.remove('on'); }, 600); };
-    if (valido && Date.now() - ultPedido > 20000) {
+    if (valido && Date.now() - ultPedido > 3000) {
       ultPedido = Date.now();
       mandarPedaco({ a: 'pac-atualizar', ts: Date.now(), n: nonce() }, enc.encode('{}')).catch(function () {});
-      setTimeout(function () { carregarPac(); }, 8000); setTimeout(function () { carregarPac(); }, 40000);
+      setTimeout(function () { carregarPac(); }, 3000); setTimeout(function () { carregarPac(); }, 8000);
     }
     carregarPac(fim);
   }
@@ -786,6 +786,19 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
   setInterval(function () { if (!document.hidden && abaLista()) carregarPac(); }, 30000);
   setInterval(function () { if (!document.hidden && !abaLista()) carregarPac(); }, 120000);
   if (valido) setTimeout(carregarPac, 800);
+  // ⚡ 17/11 (Lucas: "tira esse atraso de 20 segundos"): ouve o correio AO VIVO (SSE) — a lista nova chega na hora, sem esperar o relógio de 30 s
+  (function () {
+    if (!valido || !window.EventSource) return;
+    var es = null;
+    function abre() {
+      try { if (es) es.close(); } catch (e) {}
+      es = new EventSource('https://ntfy.sh/' + encodeURIComponent(T + 'p') + '/sse');
+      es.onmessage = function () { if (!document.hidden) carregarPac(); };
+      es.onerror = function () { try { es.close(); } catch (e) {} setTimeout(abre, 5000); };
+    }
+    abre();
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) { carregarPac(); if (!es || es.readyState === 2) abre(); } });
+  })();
 
   // ======================= 📱 WHATSAPP + 🔑 LOGIN (16/11) =======================
   // Vêm na MESMA lista cifrada do <T>p (pac.wa, pac.wa_acoes, pac.login). Desconectar = ação cifrada 'wa-desligar' {id}
