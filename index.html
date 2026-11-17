@@ -88,8 +88,8 @@ textarea::placeholder { color:var(--ink3); }
 /* barra de abas */
 nav { position:fixed; left:0; right:0; bottom:0; z-index:5; display:flex; justify-content:center; padding:8px 16px calc(env(safe-area-inset-bottom) + 8px);
   background:rgba(7,11,29,.82); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border-top:1px solid var(--bord); }
-nav .in { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; width:100%; max-width:520px; }
-nav button { position:relative; border:0; background:transparent; color:var(--ink3); font:inherit; font-size:12px; padding:6px 0; border-radius:14px; display:flex; flex-direction:column; align-items:center; gap:2px; }
+nav .in { display:grid; grid-template-columns:repeat(6,1fr); gap:6px; width:100%; max-width:520px; }
+nav button { position:relative; border:0; background:transparent; color:var(--ink3); font:inherit; font-size:11px; padding:6px 0; min-width:0; border-radius:14px; display:flex; flex-direction:column; align-items:center; gap:2px; }
 nav .selo { position:absolute; top:2px; left:calc(50% + 8px); min-width:18px; height:18px; padding:0 5px; border-radius:9px; background:#ff5a6e; color:#fff; font-size:11px; font-weight:700; line-height:18px; text-align:center; }
 nav .selo:empty { display:none; }
 
@@ -122,8 +122,18 @@ nav .selo:empty { display:none; }
 .pk.ref .tag.est { color:#ffd27a; } .pk.verde .tag.est { color:var(--ok); } .pk.verm .tag.est { color:#ff9aa6; }
 .arqs { margin-top:4px; } .arqs summary { color:var(--ink3); font-size:14px; padding:8px 2px; cursor:pointer; list-style:none; }
 .arqs summary::-webkit-details-marker { display:none; } .arqs[open] summary { margin-bottom:8px; }
-.puxa { text-align:center; font-size:13px; color:var(--ink2); height:0; overflow:hidden; transition:height .15s ease; margin-bottom:-16px; }
-.puxa.on { height:26px; margin-bottom:0; }
+.puxa { position:fixed; left:50%; top:calc(env(safe-area-inset-top) + 6px); transform:translate(-50%,-60px); z-index:8; font-size:13px; color:var(--ink);
+  background:rgba(91,76,224,.92); padding:6px 14px; border-radius:16px; transition:transform .15s ease; pointer-events:none; }
+.puxa.on { transform:translate(-50%,0); }
+/* 📱 whatsapp + 🔑 login */
+.wa { background:var(--card); border:1px solid var(--bord); border-radius:18px; padding:14px; display:flex; flex-direction:column; gap:10px; }
+.wa .top { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
+.wa .dest { font-weight:700; font-size:16px; } .wa .num { color:var(--ink2); font-size:14px; font-variant-numeric:tabular-nums; margin-top:2px; }
+.pill { flex:0 0 auto; font-size:13px; font-weight:700; border-radius:12px; padding:4px 10px; }
+.pill.on { background:rgba(91,227,168,.16); color:var(--ok); } .pill.off { background:rgba(255,122,138,.16); color:#ff9aa6; }
+.entrar { flex:0 0 auto; border-radius:12px; background:#5b4ce0; color:#fff; font-weight:700; font-size:15px; padding:10px 16px; text-decoration:none; }
+.item .t b { font-weight:600; }
+.abrir-nuvem { display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; }
 .res { display:flex; gap:10px; align-items:flex-start; font-size:14px; color:var(--ink2); background:rgba(255,255,255,.03); border:1px solid var(--bord); border-radius:14px; padding:10px 12px; }
 .res b { color:var(--ink); font-weight:600; } .res .em { margin-left:auto; color:var(--ink3); font-variant-numeric:tabular-nums; flex:0 0 auto; }
 .folha { position:fixed; inset:0; z-index:12; background:var(--bg); display:none; flex-direction:column; }
@@ -149,7 +159,7 @@ nav .selo:empty { display:none; }
 .bp.larga { min-height:60px; flex-direction:row; gap:10px; font-size:18px; } .bp.larga span { font-size:22px; }
 .bp.cinza { background:rgba(255,255,255,.1); color:var(--ink); }
 .folha textarea { min-height:120px; font-size:17px; }
-nav button span { font-size:24px; line-height:1.1; filter:grayscale(.7); }
+nav button span { font-size:22px; line-height:1.1; filter:grayscale(.7); }
 nav button.on { color:var(--ink); background:rgba(255,255,255,.07); }
 nav button.on span { filter:none; }
 
@@ -172,6 +182,7 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
 </head>
 <body>
 <div class="ceu" id="ceu"></div>
+<div class="puxa" id="pac-puxa">↓ puxa pra atualizar</div>
 <main>
   <div class="sem">🔒 link incompleto — abre pelo link completo que a Secretaria mandou.</div>
 
@@ -226,11 +237,29 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
 
   <!-- 📦 PACOTES: mensagens que a Secretaria vai mandar pra terceiros — só saem quando o Lucas toca ✅ aqui -->
   <section class="aba" id="aba-pac">
-    <div class="puxa" id="pac-puxa">↓ puxa pra atualizar</div>
     <header><h1>Pacotes</h1><div class="hora" id="pac-qtd"></div></header>
     <div class="lista" id="l-pac"></div>
     <div class="atual" id="pac-atual"></div>
     <details class="arqs" id="pac-arq" style="display:none"><summary>🗂️ arquivados (<span id="pac-arq-n">0</span>)</summary><div class="lista" id="l-pac-arq"></div></details>
+  </section>
+
+  <!-- 📱 WHATSAPP: as 2 conexões do PC, com 🔌 desconectar (logout de verdade, confirmação dupla) -->
+  <section class="aba" id="aba-wa">
+    <header><h1>WhatsApp</h1><div class="hora">conectados no PC</div></header>
+    <div class="lista" id="l-wa"></div>
+    <div class="hist" id="wa-hist"></div>
+    <div class="atual" id="wa-atual"></div>
+  </section>
+
+  <!-- 🔑 LOGIN: o que falta logar (fila de logins da Secretaria) + navegador da nuvem já no site -->
+  <section class="aba" id="aba-login">
+    <header><h1>Login</h1><div class="hora" id="lg-qtd"></div></header>
+    <a class="benviar abrir-nuvem" id="lg-abrir" target="_blank" rel="noopener" href="https://nx-a7k.tail3c7666.ts.net/nuvem/">🌐 abrir navegador da nuvem</a>
+    <div class="sec">🔐 falta logar</div>
+    <div class="lista" id="l-login"></div>
+    <details class="arqs" id="lg-con" style="display:none"><summary>✓ já logados (<span id="lg-con-n">0</span>)</summary><div class="hist" id="l-login-con"></div></details>
+    <div class="atual" id="lg-atual"></div>
+    <div class="rodape">precisa do Tailscale ligado no iPhone. o login é feito no navegador da nuvem (🔑 Cofre / 🔐 Entrar no site).</div>
   </section>
 </main>
 
@@ -241,6 +270,8 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
   <button data-aba="notas"><span>📝</span>notas</button>
   <button data-aba="hoje"><span>✅</span>hoje</button>
   <button data-aba="pac"><span>📦</span>pacotes<i class="selo" id="pac-selo"></i></button>
+  <button data-aba="wa"><span>📱</span>whatsapp</button>
+  <button data-aba="login"><span>🔑</span>login</button>
   <!-- 14/11 (Lucas): aba senhas escondida — salvar senha agora é pelo navegador da nuvem (🔑 Cofre / 💾 salvar no cofre). Rota do servidor continua. -->
 </div></nav>
 
@@ -277,11 +308,11 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
   // ---------- abas ----------
   var abaIni = h.get('aba') || ls.get('app_aba') || 'sono';
   function irAba(a) {
-    ['sono', 'notas', 'hoje', 'senhas', 'pac'].forEach(function (x) { $('aba-' + x).classList.toggle('on', x === a); });
+    ['sono', 'notas', 'hoje', 'senhas', 'pac', 'wa', 'login'].forEach(function (x) { $('aba-' + x).classList.toggle('on', x === a); });
     document.querySelectorAll('nav button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-aba') === a); });
     ls.set('app_aba', a);
     if (a === 'hoje') carregarHoje();
-    if (a === 'pac') carregarPac();
+    if (a === 'pac' || a === 'wa' || a === 'login') carregarPac();
   }
   document.querySelectorAll('nav button').forEach(function (b) { b.onclick = function () { irAba(b.getAttribute('data-aba')); }; });
 
@@ -594,6 +625,7 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
     $('l-pac-arq').innerHTML = m.arq.map(function (x) { return htmlCard(x, true); }).join('');
     ligarCards();
     $('pac-atual').textContent = pac.ger ? 'atualizado ' + hh(pac.ger) + ' · puxa a tela pra baixo pra atualizar' : '';
+    desenharWa(); desenharLogin();
   }
   // cartão = acordeão: tocar no topo abre ALI MESMO (mensagens inteiras + fotos + anexos + ✅ ❌ ✏️); tocar de novo recolhe
   var abertoC = null, modo = '', rascRef = '';
@@ -735,7 +767,7 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
   (function () {
     var y0 = null, puxou = false;
     document.addEventListener('touchstart', function (e) {
-      if (!$('aba-pac').classList.contains('on') || window.scrollY > 0) { y0 = null; return; }
+      if (!abaLista() || window.scrollY > 0) { y0 = null; return; }
       y0 = e.touches[0].clientY; puxou = false;
     }, { passive: true });
     document.addEventListener('touchmove', function (e) {
@@ -750,12 +782,76 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
     }, { passive: true });
   })();
   // a lista atualiza a cada 30 s com a aba aberta; o selo (nº esperando) a cada 2 min com o app aberto
-  setInterval(function () { if (!document.hidden && $('aba-pac').classList.contains('on')) carregarPac(); }, 30000);
-  setInterval(function () { if (!document.hidden && !$('aba-pac').classList.contains('on')) carregarPac(); }, 120000);
+  function abaLista() { return ['pac', 'wa', 'login'].some(function (x) { return $('aba-' + x).classList.contains('on'); }); }
+  setInterval(function () { if (!document.hidden && abaLista()) carregarPac(); }, 30000);
+  setInterval(function () { if (!document.hidden && !abaLista()) carregarPac(); }, 120000);
   if (valido) setTimeout(carregarPac, 800);
 
+  // ======================= 📱 WHATSAPP + 🔑 LOGIN (16/11) =======================
+  // Vêm na MESMA lista cifrada do <T>p (pac.wa, pac.wa_acoes, pac.login). Desconectar = ação cifrada 'wa-desligar' {id}
+  // → a Secretaria faz logout de verdade (remove o aparelho vinculado). Voltar só pelo QR no painel do PC.
+  var waPasso = {}; // id → 1 (1ª confirmação) | 2 (2ª) | 'reco' (instrução de reconectar)
+  var waPend = {}; try { waPend = JSON.parse(ls.get('wa_pend') || '{}'); } catch (e) {}
+  function fone(n) { n = String(n || '').replace(/\D/g, ''); var m = n.match(/^55(\d{2})(\d{4,5})(\d{4})$/); return m ? '(' + m[1] + ') ' + m[2] + '-' + m[3] : n; }
+  function desenharWa() {
+    if (!pac) { $('l-wa').innerHTML = '<div class="vazio">carregando…</div>'; return; }
+    var l = pac.wa || [];
+    Object.keys(waPend).forEach(function (id) { if (Date.now() - waPend[id] > 5 * 60000 || (pac.wa_acoes || []).some(function (a) { return a.id === id && a.em >= waPend[id] - 120000; })) delete waPend[id]; });
+    ls.set('wa_pend', JSON.stringify(waPend));
+    $('l-wa').innerHTML = l.length ? l.map(function (c) {
+      var on = c.estado === 'conectado', p = waPasso[c.id];
+      var h = '<div class="wa"><div class="top"><div><div class="dest">' + esc(c.nome) + '</div><div class="num">' + esc(fone(c.numero)) + '</div></div>' +
+        '<span class="pill ' + (on ? 'on' : 'off') + '">' + (on ? '🟢 conectado' : '🔴 ' + esc(c.estado || 'desligado')) + '</span></div>' +
+        (on && c.desde ? '<div class="num">desde ' + esc(quando(c.desde)) + '</div>' : '');
+      if (waPend[c.id]) h += '<div class="aviso">⏳ pedido de desconectar enviado — confirma aqui em até 1 min</div>';
+      else if (p === 1) h += '<div class="aviso">desconectar <b>' + esc(c.nome) + '</b> agora? ' + (c.id === 'principal' ? 'a Secretaria para de ler e mandar no WhatsApp.' : 'o robô do número para.') + ' pra voltar precisa ler o QR de novo no PC.</div>' +
+        '<div class="duas"><button class="bp cinza larga" data-w="volta" data-id="' + esc(c.id) + '">voltar</button><button class="bp nao larga" data-w="p2" data-id="' + esc(c.id) + '">sim, desconectar</button></div>';
+      else if (p === 2) h += '<div class="aviso" style="text-align:center"><b>última confirmação</b> — toca no vermelho pra DESCONECTAR</div>' +
+        '<div class="duas"><button class="bp cinza larga" data-w="volta" data-id="' + esc(c.id) + '">não</button><button class="bp nao larga" data-w="vai" data-id="' + esc(c.id) + '"><span>🔌</span>DESCONECTAR</button></div>';
+      else if (p === 'reco') h += '<div class="aviso">reconectar é pelo QR, no PC: ' + (c.id === 'principal' ? 'painel da Secretaria (localhost:8323) → WhatsApp → QR' : 'painel do Número desativado (localhost:8334) → <b>Gerar QR</b>') +
+        '. no celular do número: WhatsApp → Aparelhos conectados → Conectar aparelho → lê o QR.</div><button class="bp cinza larga" data-w="volta" data-id="' + esc(c.id) + '">ok</button>';
+      else h += on ? '<button class="bp nao larga" data-w="p1" data-id="' + esc(c.id) + '"><span>🔌</span>desconectar</button>'
+        : '<button class="bp cinza larga" data-w="reco" data-id="' + esc(c.id) + '"><span>🔁</span>como reconectar</button>';
+      return h + '</div>';
+    }).join('') : '<div class="vazio">a Secretaria ainda não mandou as conexões</div>';
+    var ac = (pac.wa_acoes || []).filter(function (a) { return !a.teste; });
+    $('wa-hist').innerHTML = ac.slice(0, 5).map(function (a) { return '<div>' + (a.ok ? '✓ ' : '⚠️ ') + esc(quando(a.em)) + ' · ' + esc(a.id === 'principal' ? 'Secretaria' : a.id === 'dz' ? 'Número desativado' : a.id) + ' · ' + esc(a.msg) + '</div>'; }).join('');
+    $('wa-atual').textContent = pac.ger ? 'atualizado ' + hh(pac.ger) : '';
+    $('l-wa').querySelectorAll('[data-w]').forEach(function (b) {
+      b.onclick = function () {
+        var id = b.getAttribute('data-id'), w = b.getAttribute('data-w');
+        if (w === 'p1') waPasso[id] = 1; else if (w === 'p2') waPasso[id] = 2; else if (w === 'reco') waPasso[id] = 'reco'; else if (w === 'volta') delete waPasso[id];
+        else if (w === 'vai') return desligarWa(id, b);
+        desenharWa();
+      };
+    });
+  }
+  function desligarWa(id, b) {
+    if (!valido) return;
+    b.disabled = true;
+    mandarPedaco({ a: 'wa-desligar', ts: Date.now(), n: nonce() }, enc.encode(JSON.stringify({ id: id })))
+      .then(function () { delete waPasso[id]; waPend[id] = Date.now(); ls.set('wa_pend', JSON.stringify(waPend)); if (navigator.vibrate) navigator.vibrate(40); desenharWa(); setTimeout(carregarPac, 30000); setTimeout(carregarPac, 60000); })
+      .catch(function (e) { b.disabled = false; alert('😕 não foi: ' + (e.message || 'sem internet') + ' — tenta de novo'); });
+  }
+  function desenharLogin() {
+    var L = pac && pac.login;
+    var nuvem = (L && L.nuvem) || 'https://nx-a7k.tail3c7666.ts.net/nuvem/';
+    $('lg-abrir').href = nuvem;
+    if (!L) { $('l-login').innerHTML = '<div class="vazio">carregando…</div>'; return; }
+    if (L.erro) { $('l-login').innerHTML = '<div class="vazio">😕 ' + esc(L.erro) + '</div>'; return; }
+    $('lg-qtd').textContent = L.sites.length ? L.sites.length + ' pra logar' : 'tudo logado';
+    $('l-login').innerHTML = L.sites.length ? L.sites.map(function (x) {
+      return '<div class="item"><div class="t"><b>' + esc(x.nome) + '</b><small>' + esc(x.txt || '') + (x.esperando ? ' · ' + x.esperando + ' tarefa' + (x.esperando > 1 ? 's' : '') + ' esperando' : '') + '</small></div>' +
+        (x.manual ? '<span class="tag">' + esc(x.manual === 'status' ? 'no painel do PC' : x.manual) + '</span>' : x.url ? '<a class="entrar" target="_blank" rel="noopener" href="' + esc(nuvem + '?ir=' + encodeURIComponent(x.url)) + '">entrar</a>' : '') + '</div>';
+    }).join('') : '<div class="vazio">nenhum site esperando login 🎉</div>';
+    $('lg-con').style.display = (L.conectados || []).length ? '' : 'none';
+    $('lg-con-n').textContent = (L.conectados || []).length;
+    $('l-login-con').innerHTML = (L.conectados || []).map(function (n) { return '<div>✓ ' + esc(n) + '</div>'; }).join('');
+    $('lg-atual').textContent = pac.ger ? 'atualizado ' + hh(pac.ger) + ' · puxa a tela pra baixo pra atualizar' : '';
+  }
+
   document.addEventListener('visibilitychange', function () { if (!document.hidden) { relogio(); if ($('aba-hoje').classList.contains('on')) carregarHoje(); carregarPac(); } });
-  irAba(['sono', 'notas', 'hoje', 'pac'].indexOf(abaIni) >= 0 ? abaIni : 'sono');
+  irAba(['sono', 'notas', 'hoje', 'pac', 'wa', 'login'].indexOf(abaIni) >= 0 ? abaIni : 'sono');
 })();
 </script>
 </body>
