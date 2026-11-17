@@ -178,6 +178,39 @@ nav button.on span { filter:none; }
 .conf .barra i { display:block; height:100%; background:#b9a8ff; transform-origin:left; }
 .sem { display:none; text-align:center; color:var(--ink2); font-size:16px; margin-top:30px; }
 body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .sem { display:block; }
+/* 💬 sub-abas dentro do whatsapp */
+.sub { display:grid; grid-template-columns:1fr 1fr; gap:6px; background:rgba(255,255,255,.05); border:1px solid var(--bord); border-radius:16px; padding:4px; }
+.sub button { position:relative; border:0; border-radius:12px; background:transparent; color:var(--ink2); font:inherit; font-size:15px; font-weight:600; padding:11px 6px; }
+.sub button.on { background:rgba(123,108,255,.35); color:var(--ink); }
+.sub .selo { position:static; display:inline-block; margin-left:6px; min-width:20px; height:20px; padding:0 6px; border-radius:10px; background:#ff5a6e; color:#fff; font-size:12px; font-weight:700; line-height:20px; text-align:center; }
+.sub .selo:empty { display:none; }
+.subcorpo { display:none; flex-direction:column; gap:16px; } .subcorpo.on { display:flex; }
+/* 💸 pagamentos */
+.ct { background:var(--card); border:1px solid var(--bord); border-radius:20px; padding:16px; display:flex; flex-direction:column; gap:10px; }
+.ct .cab-ct { display:flex; align-items:center; gap:12px; cursor:pointer; }
+.ct .cab-ct:active { opacity:.8; }
+.ct .nm { flex:1; min-width:0; font-weight:700; font-size:17px; line-height:1.25; }
+.ct .nm small { display:block; color:var(--ink3); font-size:12px; font-weight:400; margin-top:2px; }
+.ct .sd { font-variant-numeric:tabular-nums; font-weight:800; font-size:19px; white-space:nowrap; }
+.ct .sd.zero { color:var(--ink3); font-weight:600; }
+.ct .np { flex:0 0 auto; min-width:26px; height:26px; padding:0 8px; border-radius:13px; background:#ff5a6e; color:#fff; font-size:14px; font-weight:800; line-height:26px; text-align:center; }
+.ct.tem { border-color:rgba(123,108,255,.6); background:rgba(123,108,255,.10); }
+.ct.sem-conta { border-style:dashed; }
+.lt { background:rgba(0,0,0,.2); border:1px solid var(--bord); border-radius:16px; padding:12px; display:flex; flex-direction:column; gap:8px; }
+.lt h4 { margin:0; font-size:15px; line-height:1.3; }
+.lt .pix { display:flex; justify-content:space-between; gap:10px; padding:8px 0; border-top:1px solid var(--bord); font-size:15px; }
+.lt .pix small { display:block; color:var(--ink3); font-size:12px; margin-top:2px; word-break:break-word; }
+.lt .pix .v { font-weight:700; white-space:nowrap; text-align:right; font-variant-numeric:tabular-nums; }
+.lt .pix .v small { text-align:right; }
+.lt .tot { display:flex; justify-content:space-between; font-size:16px; font-weight:800; padding-top:8px; border-top:1px solid var(--bord); font-variant-numeric:tabular-nums; }
+.lt .escolhe { display:flex; flex-wrap:wrap; gap:6px; }
+.lt .escolhe button { border:1px solid var(--bord); background:rgba(255,255,255,.06); color:var(--ink); font:inherit; font-size:13px; border-radius:12px; padding:8px 10px; }
+.lt .escolhe button.on { border-color:#b9a8ff; background:rgba(123,108,255,.3); }
+.bp.pagar { background:linear-gradient(135deg,#2fbf7f,#1c8a5a); min-height:64px; font-size:17px; letter-spacing:.02em; }
+.lt.feito { border-color:rgba(91,227,168,.5); background:rgba(47,191,127,.10); }
+.lt.feito.ruim { border-color:rgba(255,122,138,.55); background:rgba(255,107,125,.10); }
+.lt .ok { color:var(--ok); } .lt .er { color:var(--ruim); }
+
 </style>
 </head>
 <body>
@@ -235,20 +268,29 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
     <div class="atual" id="hoje-atual"></div>
   </section>
 
-  <!-- 📦 PACOTES: mensagens que a Secretaria vai mandar pra terceiros — só saem quando o Lucas toca ✅ aqui -->
-  <section class="aba" id="aba-pac">
-    <header><h1>Pacotes</h1><div class="hora" id="pac-qtd"></div></header>
-    <div class="lista" id="l-pac"></div>
-    <div class="atual" id="pac-atual"></div>
-    <details class="arqs" id="pac-arq" style="display:none"><summary>🗂️ arquivados (<span id="pac-arq-n">0</span>)</summary><div class="lista" id="l-pac-arq"></div></details>
+  <!-- 💸 PAGAMENTOS (17/11): só as contas Asaas com saldo ao vivo; toca na conta → pacotes de Pix pendentes dela → APROVAR / ENVIAR.
+       Cada Pix entra PARADO no Asaas e só sai com o token do Lucas. -->
+  <section class="aba" id="aba-pag">
+    <header><h1>Pagamentos</h1><div class="hora" id="pag-qtd"></div></header>
+    <div class="lista" id="l-pag"></div>
+    <details class="arqs" id="pag-feitos" style="display:none"><summary>✓ feitos (<span id="pag-feitos-n">0</span>)</summary><div class="lista" id="l-pag-feitos"></div></details>
+    <div class="atual" id="pag-atual"></div>
   </section>
 
-  <!-- 📱 WHATSAPP: as 2 conexões do PC, com 🔌 desconectar (logout de verdade, confirmação dupla) -->
+  <!-- 💬 WHATSAPP (17/11): 📦 pacotes de mensagens (✅ ❌ ✏️) + 📱 as 2 conexões do PC (🔌 desconectar) -->
   <section class="aba" id="aba-wa">
-    <header><h1>WhatsApp</h1><div class="hora">conectados no PC</div></header>
-    <div class="lista" id="l-wa"></div>
-    <div class="hist" id="wa-hist"></div>
-    <div class="atual" id="wa-atual"></div>
+    <header><h1>WhatsApp</h1><div class="hora" id="pac-qtd"></div></header>
+    <div class="sub" id="wa-sub"><button data-sub="pac">📦 pacotes<i class="selo" id="pac-selo2"></i></button><button data-sub="con">📱 conexões</button></div>
+    <div class="subcorpo" id="sub-pac">
+      <div class="lista" id="l-pac"></div>
+      <div class="atual" id="pac-atual"></div>
+      <details class="arqs" id="pac-arq" style="display:none"><summary>🗂️ arquivados (<span id="pac-arq-n">0</span>)</summary><div class="lista" id="l-pac-arq"></div></details>
+    </div>
+    <div class="subcorpo" id="sub-con">
+      <div class="lista" id="l-wa"></div>
+      <div class="hist" id="wa-hist"></div>
+      <div class="atual" id="wa-atual"></div>
+    </div>
   </section>
 
   <!-- 🔑 LOGIN: o que falta logar (fila de logins da Secretaria) + navegador da nuvem já no site -->
@@ -269,8 +311,8 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
   <button data-aba="sono"><span>😴</span>sono</button>
   <button data-aba="notas"><span>📝</span>notas</button>
   <button data-aba="hoje"><span>✅</span>hoje</button>
-  <button data-aba="pac"><span>📦</span>pacotes<i class="selo" id="pac-selo"></i></button>
-  <button data-aba="wa"><span>📱</span>whatsapp</button>
+  <button data-aba="pag"><span>💸</span>pagamentos<i class="selo" id="pag-selo"></i></button>
+  <button data-aba="wa"><span>💬</span>whatsapp<i class="selo" id="pac-selo"></i></button>
   <button data-aba="login"><span>🔑</span>login</button>
   <!-- 14/11 (Lucas): aba senhas escondida — salvar senha agora é pelo navegador da nuvem (🔑 Cofre / 💾 salvar no cofre). Rota do servidor continua. -->
 </div></nav>
@@ -307,12 +349,21 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
 
   // ---------- abas ----------
   var abaIni = h.get('aba') || ls.get('app_aba') || 'sono';
+  var subWa = ls.get('wa_sub') === 'con' ? 'con' : 'pac';
+  function irSub(x) {
+    subWa = x === 'con' ? 'con' : 'pac'; ls.set('wa_sub', subWa);
+    $('sub-pac').classList.toggle('on', subWa === 'pac'); $('sub-con').classList.toggle('on', subWa === 'con');
+    document.querySelectorAll('#wa-sub button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-sub') === subWa); });
+  }
+  document.querySelectorAll('#wa-sub button').forEach(function (b) { b.onclick = function () { irSub(b.getAttribute('data-sub')); }; });
+  irSub(subWa);
   function irAba(a) {
-    ['sono', 'notas', 'hoje', 'senhas', 'pac', 'wa', 'login'].forEach(function (x) { $('aba-' + x).classList.toggle('on', x === a); });
+    if (a === 'pac') { a = 'wa'; irSub('pac'); } // 17/11: 📦 pacotes mora dentro do 💬 whatsapp (link antigo #aba=pac continua valendo)
+    ['sono', 'notas', 'hoje', 'senhas', 'pag', 'wa', 'login'].forEach(function (x) { $('aba-' + x).classList.toggle('on', x === a); });
     document.querySelectorAll('nav button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-aba') === a); });
     ls.set('app_aba', a);
     if (a === 'hoje') carregarHoje();
-    if (a === 'pac' || a === 'wa' || a === 'login') carregarPac();
+    if (a === 'pag' || a === 'wa' || a === 'login') carregarPac();
   }
   document.querySelectorAll('nav button').forEach(function (b) { b.onclick = function () { irAba(b.getAttribute('data-aba')); }; });
 
@@ -613,11 +664,11 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
   var ROT = { refazendo: '✏️ refazendo…', enviando: '⏳ mandando…', descartando: '⏳ não mandando…', mandado: '✅ mandado', naomandado: '❌ não mandado', erro: '⚠️ erro' };
   function desenharPac() {
     if (modo === 'ref' && document.activeElement && document.activeElement.id === 'p-nota') return; // não apaga o que ele está digitando
-    if (!pac) { $('l-pac').innerHTML = '<div class="vazio">carregando…</div>'; return; }
+    if (!pac) { $('l-pac').innerHTML = '<div class="vazio">carregando…</div>'; desenharPag(); return; }
     limparPend();
     var m = montarCards();
     var esperando = m.vivos.filter(function (x) { return x.vivo && (!x.est || x.est === 'refazendo'); }).length;
-    $('pac-selo').textContent = esperando ? String(esperando) : '';
+    $('pac-selo').textContent = esperando ? String(esperando) : ''; $('pac-selo2').textContent = esperando ? String(esperando) : '';
     $('pac-qtd').textContent = esperando ? esperando + ' esperando' : '';
     $('l-pac').innerHTML = m.vivos.length ? m.vivos.map(function (x) { return htmlCard(x, false); }).join('') : '<div class="vazio">nenhum pacote esperando 🎉</div>';
     $('pac-arq').style.display = m.arq.length ? '' : 'none';
@@ -625,7 +676,7 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
     $('l-pac-arq').innerHTML = m.arq.map(function (x) { return htmlCard(x, true); }).join('');
     ligarCards();
     $('pac-atual').textContent = pac.ger ? 'atualizado ' + hh(pac.ger) + ' · puxa a tela pra baixo pra atualizar' : '';
-    desenharWa(); desenharLogin();
+    desenharWa(); desenharLogin(); desenharPag();
   }
   // cartão = acordeão: tocar no topo abre ALI MESMO (mensagens inteiras + fotos + anexos + ✅ ❌ ✏️); tocar de novo recolhe
   var abertoC = null, modo = '', rascRef = '';
@@ -782,7 +833,7 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
     }, { passive: true });
   })();
   // a lista atualiza a cada 30 s com a aba aberta; o selo (nº esperando) a cada 2 min com o app aberto
-  function abaLista() { return ['pac', 'wa', 'login'].some(function (x) { return $('aba-' + x).classList.contains('on'); }); }
+  function abaLista() { return ['pag', 'wa', 'login'].some(function (x) { return $('aba-' + x).classList.contains('on'); }); }
   setInterval(function () { if (!document.hidden && abaLista()) carregarPac(); }, 30000);
   setInterval(function () { if (!document.hidden && !abaLista()) carregarPac(); }, 120000);
   if (valido) setTimeout(carregarPac, 800);
@@ -863,8 +914,109 @@ body.semlink .aba, body.semlink nav { display:none !important; } body.semlink .s
     $('lg-atual').textContent = pac.ger ? 'atualizado ' + hh(pac.ger) + ' · puxa a tela pra baixo pra atualizar' : '';
   }
 
+  // ======================= 💸 PAGAMENTOS (17/11) =======================
+  // Lucas: "nessa tela fique só as contas... clico na conta que quero e aí abre os pacotes pendentes dela... saldo em tempo real".
+  // Vem na MESMA lista cifrada do <T>p (pac.pagamentos: contas+saldo, lotes abertos, feitos, acoes). Aprovar = ação cifrada
+  // 'pix-lote' {id, conta, total} → a Secretaria chama o MESMO envio da tela /p/pix. Cada Pix entra PARADO no Asaas (token dele).
+  var pagAberta = null, pagConf = {}, pagEscolha = {};
+  var pixPend = {}; try { pixPend = JSON.parse(ls.get('pix_pend') || '{}'); } catch (e) {}
+  var RECENTE = 10 * 60000;
+  function brl(v) { return v == null || isNaN(v) ? '—' : 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function r2(v) { return Math.round(v * 100) / 100; }
+  function contaPor(P, id) { return (P.contas || []).filter(function (c) { return c.id === id; })[0] || null; }
+  function contaDe(l) { return l.conta || pagEscolha[l.id] || null; }
+  function calcLote(P, l) {
+    var c = contaDe(l) ? contaPor(P, contaDe(l)) : null, saldo = c ? c.saldo : null;
+    var resto = l.resto ? (saldo == null ? null : r2(saldo - l.fixos)) : null;
+    return { conta: c, saldo: saldo, resto: resto, total: r2(l.fixos + (resto || 0)), ruim: l.resto && !(resto > 0) };
+  }
+  function ultPix(P, id) { return (P.acoes || []).filter(function (a) { return a.id === id; })[0] || null; }
+  function htmlLote(P, l) {
+    var k = calcLote(P, l), pend = pixPend[l.id], a = ultPix(P, l.id), n = l.itens.length;
+    var semConta = !l.conta;
+    var h = '<div class="lt" data-l="' + l.id + '"><h4>' + esc(l.titulo) + '</h4>';
+    if (semConta) h += '<div class="escolhe">' + (P.contas || []).map(function (c) {
+      return '<button data-esc="' + esc(c.id) + '" data-l="' + l.id + '"' + (pagEscolha[l.id] === c.id ? ' class="on"' : '') + '>' + esc(c.nome) + ' · ' + brl(c.saldo) + '</button>'; }).join('') + '</div>';
+    h += l.itens.map(function (it) {
+      var v = it.valor === 'resto' ? (k.resto == null ? '—' : brl(k.resto)) + '<small>resto do saldo</small>' : brl(it.valor);
+      return '<div class="pix"><div>' + esc(it.nome) + '<small>' + esc(it.chave || '') + (it.descricao ? ' · ' + esc(it.descricao) : '') + '</small></div><div class="v">' + v + '</div></div>';
+    }).join('');
+    h += '<div class="tot"><span>total</span><span>' + (k.ruim ? '—' : l.resto && k.resto == null ? brl(l.fixos) + ' + resto' : brl(k.total)) + '</span></div>';
+    var enviando = l.status === 'enviando' || !!pend;
+    if (a && !pend && !k.ruim && (a.estado === 'erro' || a.estado === 'teste')) h += '<div class="aviso">' + (a.estado === 'teste' ? '🧪 ' : '⚠️ ') + esc(a.msg) + '</div>';
+    if (enviando) return h + '<button class="bp pagar larga" disabled>⏳ enviando…</button></div>';
+    if (semConta && !pagEscolha[l.id]) return h + '<div class="aviso">escolhe de qual conta sai ↑</div></div>';
+    if (k.ruim) return h + '<div class="aviso">⚠️ o resto deu ' + brl(k.resto) + ' (saldo ' + brl(k.saldo) + ') — não dá pra enviar</div></div>';
+    if (pagConf[l.id]) return h + '<div class="aviso" style="text-align:center">mandar <b>' + n + ' Pix</b> da conta <b>' + esc(k.conta ? k.conta.nome : '') + '</b>, total <b>' + brl(k.total) + '</b>?<br>entram PARADOS no Asaas — só saem com o seu token.</div>' +
+      '<div class="duas"><button class="bp cinza larga" data-p="volta" data-l="' + l.id + '">voltar</button><button class="bp pagar larga" data-p="vai" data-l="' + l.id + '"><span>✅</span>SIM, ENVIAR</button></div></div>';
+    return h + '<button class="bp pagar larga" data-p="conf" data-l="' + l.id + '"><span>✅</span>APROVAR / ENVIAR ' + (n > 1 ? 'OS ' + n : 'O PIX') + '</button></div>';
+  }
+  function htmlFeito(P, f) {
+    var c = contaPor(P, f.conta), ok = f.resultado.filter(function (r) { return r.ok; }).length;
+    return '<div class="lt feito' + (ok < f.resultado.length ? ' ruim' : '') + '"><h4>' + esc(f.titulo) + '</h4><div class="num">' + esc(c ? c.nome : f.conta) + ' · ' + esc(quando(f.em)) + ' · ' + ok + '/' + f.resultado.length + ' no Asaas</div>' +
+      f.resultado.map(function (r) {
+        return '<div class="pix"><div>' + (r.ok ? '<span class="ok">✅</span> ' : '<span class="er">❌</span> ') + esc(r.nome) + '<small>' +
+          (r.ok ? (r.parado ? 'esperando seu token no Asaas' : esc(r.status || 'ok')) : esc(r.erro || 'erro')) + (r.descricao ? ' · ' + esc(r.descricao) : '') + '</small></div><div class="v">' + brl(r.valor) + '</div></div>';
+      }).join('') + '</div>';
+  }
+  function desenharPag() {
+    var P = pac && pac.pagamentos;
+    if (!P) { $('l-pag').innerHTML = '<div class="vazio">' + (pac ? 'a Secretaria ainda não mandou as contas' : 'carregando…') + '</div>'; return; }
+    // toque que a Secretaria já registrou sai dos pendentes; >10 min sem resposta também
+    Object.keys(pixPend).forEach(function (id) {
+      var p = pixPend[id], a = ultPix(P, +id), feito = (P.feitos || []).some(function (f) { return f.id === +id; });
+      if (feito || (a && a.em >= p.em - 120000 && a.estado !== 'enviando') || Date.now() - p.em > RECENTE) delete pixPend[id];
+    });
+    ls.set('pix_pend', JSON.stringify(pixPend));
+    var lotes = P.lotes || [], feitos = P.feitos || [];
+    var porConta = {}; lotes.forEach(function (l) { var k = l.conta || '__sem__'; (porConta[k] = porConta[k] || []).push(l); });
+    var recentes = feitos.filter(function (f) { return Date.now() - f.em < RECENTE; }), velhos = feitos.filter(function (f) { return Date.now() - f.em >= RECENTE; });
+    var nPix = lotes.reduce(function (s, l) { return s + (l.status === 'aberto' ? l.itens.length : 0); }, 0);
+    $('pag-selo').textContent = nPix ? String(nPix) : '';
+    $('pag-qtd').textContent = nPix ? nPix + ' Pix pra aprovar' : '';
+    var linhas = (P.contas || []).map(function (c) { return { id: c.id, nome: c.nome, saldo: c.saldo, velho: c.velho, lotes: porConta[c.id] || [], feitos: recentes.filter(function (f) { return f.conta === c.id; }) }; });
+    if (porConta.__sem__) linhas.push({ id: '__sem__', nome: 'sem conta definida', saldo: null, sem: true, lotes: porConta.__sem__, feitos: [] });
+    $('l-pag').innerHTML = linhas.map(function (c) {
+      var n = c.lotes.reduce(function (s, l) { return s + l.itens.length; }, 0), aberta = pagAberta === c.id;
+      var h = '<div class="ct' + (n ? ' tem' : '') + (c.sem ? ' sem-conta' : '') + '" data-ct="' + esc(c.id) + '"><div class="cab-ct"><div class="nm">' + esc(c.nome) +
+        '<small>' + (n ? c.lotes.length + ' pacote' + (c.lotes.length > 1 ? 's' : '') + ' esperando' : c.feitos.length ? '✓ enviado agora' : 'nada pendente') + (c.velho ? ' · saldo antigo' : '') + '</small></div>' +
+        (c.sem ? '' : '<div class="sd' + (c.saldo ? '' : ' zero') + '">' + brl(c.saldo) + '</div>') + (n ? '<div class="np">' + n + '</div>' : '') + '<i class="seta">' + (aberta ? '▴' : '▾') + '</i></div>';
+      if (aberta) h += c.lotes.map(function (l) { return htmlLote(P, l); }).join('') + c.feitos.map(function (f) { return htmlFeito(P, f); }).join('') +
+        (!c.lotes.length && !c.feitos.length ? '<div class="vazio">nenhum pacote pendente nessa conta</div>' : '');
+      else if (c.feitos.length) h += c.feitos.map(function (f) { return htmlFeito(P, f); }).join('');
+      return h + '</div>';
+    }).join('') || '<div class="vazio">nenhuma conta</div>';
+    $('pag-feitos').style.display = velhos.length ? '' : 'none';
+    $('pag-feitos-n').textContent = velhos.length;
+    $('l-pag-feitos').innerHTML = velhos.map(function (f) { return htmlFeito(P, f); }).join('');
+    $('pag-atual').textContent = (P.saldo_em ? 'saldo de ' + hh(P.saldo_em) + ' · ' : '') + (pac.ger ? 'atualizado ' + hh(pac.ger) + ' · puxa pra atualizar' : '');
+    $('l-pag').querySelectorAll('.cab-ct').forEach(function (el) { el.onclick = function () { var id = el.parentNode.getAttribute('data-ct'); pagAberta = pagAberta === id ? null : id; pagConf = {}; desenharPag(); }; });
+    $('l-pag').querySelectorAll('[data-esc]').forEach(function (b) { b.onclick = function () { pagEscolha[b.getAttribute('data-l')] = b.getAttribute('data-esc'); delete pagConf[b.getAttribute('data-l')]; desenharPag(); }; });
+    $('l-pag').querySelectorAll('[data-p]').forEach(function (b) {
+      b.onclick = function () {
+        var id = +b.getAttribute('data-l'), w = b.getAttribute('data-p');
+        if (w === 'conf') pagConf[id] = 1; else if (w === 'volta') delete pagConf[id]; else if (w === 'vai') return enviarLote(id, b);
+        desenharPag();
+      };
+    });
+  }
+  function enviarLote(id, b) {
+    var P = pac && pac.pagamentos; if (!valido || !P) return;
+    var l = (P.lotes || []).filter(function (x) { return x.id === id; })[0]; if (!l) return;
+    var k = calcLote(P, l); if (!k.conta || k.ruim) return;
+    b.disabled = true;
+    mandarPedaco({ a: 'pix-lote', ts: Date.now(), n: nonce() }, enc.encode(JSON.stringify({ id: id, conta: k.conta.id, total: k.total })))
+      .then(function () {
+        delete pagConf[id]; pixPend[id] = { em: Date.now(), conta: k.conta.id }; ls.set('pix_pend', JSON.stringify(pixPend));
+        if (navigator.vibrate) navigator.vibrate(40);
+        desenharPag(); $('pag-atual').textContent = '✅ mandei pra Secretaria — o resultado aparece aqui';
+        setTimeout(carregarPac, 6000); setTimeout(carregarPac, 20000); setTimeout(carregarPac, 45000);
+      })
+      .catch(function (e) { b.disabled = false; alert('😕 não foi: ' + (e.message || 'sem internet') + ' — tenta de novo'); });
+  }
+
   document.addEventListener('visibilitychange', function () { if (!document.hidden) { relogio(); if ($('aba-hoje').classList.contains('on')) carregarHoje(); carregarPac(); } });
-  irAba(['sono', 'notas', 'hoje', 'pac', 'wa', 'login'].indexOf(abaIni) >= 0 ? abaIni : 'sono');
+  irAba(['sono', 'notas', 'hoje', 'pag', 'pac', 'wa', 'login'].indexOf(abaIni) >= 0 ? abaIni : 'sono');
 })();
 </script>
 </body>
